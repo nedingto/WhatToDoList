@@ -7,5 +7,9 @@
 
     <string name="hello_world">Hello world!</string>
 
+    <string name="simple_create_task_dilog">Create Task</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
+
     <string name="action_settings">Settings</string>
 </resources>

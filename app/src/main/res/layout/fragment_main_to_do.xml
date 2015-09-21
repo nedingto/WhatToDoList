@@ -333,6 +333,7 @@
                 android:layout_height="fill_parent"
                 android:text="Create Task"
                 android:id="@+id/button4"
+                android:onClick="createTask"
                />
         </TableLayout>
 

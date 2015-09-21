@@ -2,6 +2,7 @@ package com.example.nick.whattodolist;
 
 import java.util.Locale;
 
+import android.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -144,6 +145,10 @@ public class MainToDo extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_main_to_do, container, false);
             return rootView;
         }
+    }
+    public void createTask(View v){
+        DialogFragment newFragment = new simpleCreateTaskDialog();
+        newFragment.show(getFragmentManager(), "create task");
     }
 
 }
