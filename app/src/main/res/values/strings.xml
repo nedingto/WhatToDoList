@@ -10,6 +10,9 @@
     <string name="simple_create_task_dilog">Create Task</string>
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
+    <string name="next">Next</string>
+    <string name="advanced_create_task_dialog">Create Task</string>
+    <string name="edit">Edit</string>
 
 
     <string name="action_settings">Settings</string>

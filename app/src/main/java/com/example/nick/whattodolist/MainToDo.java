@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -103,29 +104,6 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener{
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
-        EditText  et = (EditText)dialog.getDialog().findViewById(R.id.editText);
-        String taskName = et.getText().toString();
-        DatePicker dp = (DatePicker) dialog.getDialog().findViewById(R.id.datePicker);
-        String dueDate = dp.getYear() + "-" + dp.getMonth() + "-" + dp.getDayOfMonth() + " 00:00:00";
-        ContentValues values = new ContentValues();
-        values.put(TaskDB.COLUMN_NAME_ENTRY_ID,taskName);
-        values.put(TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
-        values.put(TaskDB.COLUMN_NAME_CHECKED, 0);
-
-        long newRowId;
-        newRowId = dbW.insert(
-                TaskDB.TABLE_NAME,
-                null,
-                values);
-        tasksUpdated();
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
-
-    }
 
 
     /**
@@ -199,6 +177,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener{
             return rootView;
 
         }
+        //override to populate main view as soon as possible
         @Override
         public void onActivityCreated(Bundle savedInstance){
             super.onActivityCreated(savedInstance);
@@ -206,13 +185,10 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener{
         }
 
     }
-    public void createTask(View v){
-        DialogFragment newFragment = new simpleCreateTaskDialog();
-        newFragment.show(getFragmentManager(), "create task");
 
-    }
-
+    //method to populate main view, probably should use more accurate name
     public void tasksUpdated(){
+        //query creation
         String[] projection = {
                 TaskDB.COLUMN_NAME_ENTRY_ID,
                 TaskDB.COLUMN_NAME_DUE_DATE,
@@ -230,6 +206,9 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener{
                 null,                                     // don't filter by row groups
                 sortOrder                                 // The sort order
         );
+
+        //this programmatically creates the views but it might be more efficient and
+        //better practice to use a layout as a template and programmatically fill in text
         TableLayout tl = (TableLayout)findViewById(R.id.tableLayout1);
         tl.removeAllViews();
         c.moveToFirst();
@@ -254,6 +233,48 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener{
 
 
         }
+    }
+
+
+    /*reactions to creating task dialog*/
+
+    public void createTask(View v){
+        DialogFragment newFragment = new simpleCreateTaskDialog();
+        newFragment.show(getFragmentManager(), "create task");
+    }
+
+    //create task and save it when one is created
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        EditText  et = (EditText)dialog.getDialog().findViewById(R.id.editText);
+        String taskName = et.getText().toString();
+        DatePicker dp = (DatePicker) dialog.getDialog().findViewById(R.id.datePicker);
+        String dueDate = dp.getYear() + "-" + (dp.getMonth() + 1) + "-" + dp.getDayOfMonth() + " 00:00:00";
+        ContentValues values = new ContentValues();
+        values.put(TaskDB.COLUMN_NAME_ENTRY_ID,taskName);
+        values.put(TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
+        values.put(TaskDB.COLUMN_NAME_CHECKED, 0);
+
+        //hook if row id is needed later
+        //might be good to have function
+        // that only updates the newly created task
+        long newRowId;
+        newRowId = dbW.insert(
+                TaskDB.TABLE_NAME,
+                null,
+                values);
+
+        tasksUpdated();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
+    }
+
+    @Override
+    public void onAdvancedDialogPositiveClick(DialogFragment simpleDialog, DialogFragment advancedDialog){
+        Log.d("YourTag", "it made it here!");
     }
 
 }

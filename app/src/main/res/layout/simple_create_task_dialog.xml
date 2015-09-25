@@ -10,7 +10,7 @@
         android:id="@+id/textView7"
         android:textSize="25dp"
         android:layout_gravity="center_vertical" />
-
+    <!-- suggestion to make default task be the title of the field-->
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -18,13 +18,34 @@
         android:layout_gravity="center_horizontal"
         android:inputType="textNoSuggestions"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Due Date"
-        android:id="@+id/textView6"
-        android:textSize="25dp"
-        android:layout_gravity="center_horizontal" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Due Date"
+            android:id="@+id/textView6"
+            android:textSize="25dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical" />
+
+        <!-- sugestion to make a check box and when checked open dialog
+        and then fill in bases when checked, disable bases when unchecked-->
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Repeating"
+            android:id="@+id/button"
+            android:layout_gravity="right"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <!-- decided to go with date picker as apposed to spinners
+    as it is an android standard and it allows users to see
+    visually when the due date is and the day of the week -->
 
     <DatePicker
         android:layout_width="wrap_content"
