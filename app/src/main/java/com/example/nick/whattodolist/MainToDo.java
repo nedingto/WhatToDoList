@@ -10,6 +10,7 @@ import android.app.DialogFragment;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -192,7 +193,9 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
         String[] projection = {
                 TaskDB.COLUMN_NAME_ENTRY_ID,
                 TaskDB.COLUMN_NAME_DUE_DATE,
-                TaskDB.COLUMN_NAME_CHECKED
+                TaskDB.COLUMN_NAME_CHECKED,
+                TaskDB.COLUMN_NAME_PRIORITY,
+                TaskDB.COLUMN_NAME_ESTIMATED_MINS
         };
         String sortOrder =
                 "date(" + TaskDB.COLUMN_NAME_DUE_DATE + ") DESC";
@@ -223,10 +226,43 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
             tr.addView(tv1);
             tr.addView(tv2);
             tv1.setText(c.getString(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_ENTRY_ID)));
+
+            //text field for due date, will likely be displayed in a different way in final
             tv2.setText(c.getString(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_DUE_DATE)));
+
             if(c.getInt(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_CHECKED)) == 1){
                 cb.setChecked(true);
             } else cb.setChecked(false);
+
+            //switch to color the row based on priority
+            int priority = c.getInt(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_PRIORITY));
+            switch(priority) {
+                case 1:
+                    tr.setBackgroundColor(Color.rgb(0, 204, 255));
+                    break;
+                case 2:
+                    tr.setBackgroundColor(Color.rgb(0, 255, 0));
+                    break;
+                case 3:
+                    tr.setBackgroundColor(Color.rgb(255, 255, 0));
+                    break;
+                case 4:
+                    tr.setBackgroundColor(Color.rgb(255, 153, 0));
+                    break;
+                case 5:
+                    tr.setBackgroundColor(Color.rgb(255, 51, 0));
+                    break;
+                default:
+                    break;
+            }
+
+            //feild for the estimated time to complete, will likely not be displayed in final
+            int estimatedMins = c.getInt(c.getColumnIndexOrThrow((TaskDB.COLUMN_NAME_ESTIMATED_MINS)));
+            if(estimatedMins >0) {
+                TextView tv3 = new TextView(getApplication());
+                tv3.setText(" " + estimatedMins + "mins to complete");
+                tr.addView(tv3);
+            }
             tl.addView(tr);
 
             c.moveToNext();
@@ -269,7 +305,8 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
         values.put(TaskDB.COLUMN_NAME_ENTRY_ID,taskName);
         values.put(TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
         values.put(TaskDB.COLUMN_NAME_CHECKED, 0);
-
+        values.put(TaskDB.COLUMN_NAME_PRIORITY, priority);
+        values.put(TaskDB.COLUMN_NAME_ESTIMATED_MINS, estimatedMins);
         //hook if row id is needed later
         //might be good to have function
         // that only updates the newly created task

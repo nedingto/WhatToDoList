@@ -20,6 +20,8 @@ public class TaskDBContract {
         public static final String COLUMN_NAME_TITLE = "title";
         public static final String COLUMN_NAME_DUE_DATE = "duedate";
         public static final String COLUMN_NAME_CHECKED = "checked";
+        public static final String COLUMN_NAME_PRIORITY = "priority";
+        public static final String COLUMN_NAME_ESTIMATED_MINS = "estimatedMins";
 
 
     }

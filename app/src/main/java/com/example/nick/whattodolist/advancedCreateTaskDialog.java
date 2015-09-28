@@ -28,13 +28,16 @@ public class advancedCreateTaskDialog extends DialogFragment {
 
                     public void onClick(DialogInterface dialog, int id) {
                         //// TODO: 9/27/2015 make title key a string resource
+                        //gets arguments bundled from the simpleCreateTaskDialog
                         Bundle args = getArguments();
                         String taskName = args.getString("task_name");
                         String dueDate = args.getString("due_date");
 
                         AlertDialog d = (AlertDialog)dialog;
+                        //This finds the views for the entry fields and sends them, along with the bundled
+                        //info as parameters to the main activity
                         //category must be created
-                        int priority = ((RatingBar)d.findViewById(R.id.ratingBar)).getNumStars();
+                        int priority = (int)(((RatingBar)d.findViewById(R.id.ratingBar)).getRating());
                         int estimatedMins = new Integer(((EditText)d.findViewById(R.id.editText2)).getText().toString());
                         mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority, estimatedMins);
                     }
