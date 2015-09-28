@@ -7,18 +7,19 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 
 /**
  * Created by Nick on 9/20/2015.
  */
-public class simpleCreateTaskDialog extends DialogFragment
-        implements advancedCreateTaskDialog.AdvancedCreateTaskListener{
+public class simpleCreateTaskDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
 
@@ -28,13 +29,26 @@ public class simpleCreateTaskDialog extends DialogFragment
                 .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //create the task
-                        mListener.onDialogPositiveClick(simpleCreateTaskDialog.this);
+                        String taskName = ((EditText)((AlertDialog) dialog).findViewById(R.id.editText)).getText().toString();
+                        DatePicker dp = (DatePicker) ((AlertDialog) dialog).findViewById(R.id.datePicker);
+                        String dueDate = dp.getYear() + "-" + (dp.getMonth() + 1) + "-" + dp.getDayOfMonth() + " 00:00:00";
+                        mListener.onSimpleDialogPositiveClick(taskName, dueDate);
                     }
                 })
                 .setNeutralButton(R.string.next, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id){
-                        //move on to the next dialog
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Move on to the next dialog pack a bundle to send to the next dialog.
+                        //Might be useful to have this somehow happen beforehand so it can also be
+                        //the arguments pass for the onPositive click function
+                        Bundle args = new Bundle();
+                        String taskName = ((EditText) ((AlertDialog) dialog).findViewById(R.id.editText)).getText().toString();
+                        DatePicker dp = (DatePicker) ((AlertDialog) dialog).findViewById(R.id.datePicker);
+                        String dueDate = dp.getYear() + "-" + (dp.getMonth() + 1) + "-" + dp.getDayOfMonth() + " 00:00:00";
+                        //should be a better way of making sure these key names stay consistent
+                        args.putString("task_name", taskName);
+                        args.putString("due_date", dueDate);
                         DialogFragment newFragment = new advancedCreateTaskDialog();
+                        newFragment.setArguments(args);
                         newFragment.show(getFragmentManager(), "create task advanced");
                     }
                 })
@@ -47,10 +61,9 @@ public class simpleCreateTaskDialog extends DialogFragment
         return builder.create();
     }
     public interface SimpleCreateTaskListener {
-        public void onDialogPositiveClick(DialogFragment dialog);
-        public void onAdvancedDialogPositiveClick(DialogFragment simpleDialog, DialogFragment advancedDialog);
-        public void onDialogNegativeClick(DialogFragment dialog);
+        public void onSimpleDialogPositiveClick(String taskName, String dueDate);
     }
+
 
     // Use this instance of the interface to deliver action events
     SimpleCreateTaskListener mListener;
@@ -69,8 +82,5 @@ public class simpleCreateTaskDialog extends DialogFragment
                     + " must implement NoticeDialogListener");
         }
     }
-    @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
-        mListener.onAdvancedDialogPositiveClick(simpleCreateTaskDialog.this, dialog);
-    }
+
 }

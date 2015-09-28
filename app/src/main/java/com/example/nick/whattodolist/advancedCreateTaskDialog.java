@@ -7,13 +7,15 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.widget.EditText;
+import android.widget.RatingBar;
 
 /**
  * Created by Nick on 9/24/2015.
  */
 public class advancedCreateTaskDialog extends DialogFragment {
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(final Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -23,8 +25,18 @@ public class advancedCreateTaskDialog extends DialogFragment {
                 //setting the message appears to be causing an issue
                 .setMessage(R.string.advanced_create_task_dialog)
                 .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
 
+                    public void onClick(DialogInterface dialog, int id) {
+                        //// TODO: 9/27/2015 make title key a string resource
+                        Bundle args = getArguments();
+                        String taskName = args.getString("task_name");
+                        String dueDate = args.getString("due_date");
+
+                        AlertDialog d = (AlertDialog)dialog;
+                        //category must be created
+                        int priority = ((RatingBar)d.findViewById(R.id.ratingBar)).getNumStars();
+                        int estimatedMins = new Integer(((EditText)d.findViewById(R.id.editText2)).getText().toString());
+                        mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority, estimatedMins);
                     }
                 })
                 .setNeutralButton(R.string.edit, new DialogInterface.OnClickListener() {
@@ -42,7 +54,7 @@ public class advancedCreateTaskDialog extends DialogFragment {
     }
 
     public interface AdvancedCreateTaskListener {
-        public void onDialogPositiveClick(DialogFragment dialog);
+        public void onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins);
     }
 
 

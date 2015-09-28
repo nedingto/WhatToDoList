@@ -36,7 +36,7 @@ import android.widget.TextView;
 import com.example.nick.whattodolist.TaskDBContract.TaskDB;
 
 public class MainToDo extends AppCompatActivity
-implements simpleCreateTaskDialog.SimpleCreateTaskListener{
+implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDialog.AdvancedCreateTaskListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -245,11 +245,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener{
 
     //create task and save it when one is created
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
-        EditText  et = (EditText)dialog.getDialog().findViewById(R.id.editText);
-        String taskName = et.getText().toString();
-        DatePicker dp = (DatePicker) dialog.getDialog().findViewById(R.id.datePicker);
-        String dueDate = dp.getYear() + "-" + (dp.getMonth() + 1) + "-" + dp.getDayOfMonth() + " 00:00:00";
+    public void onSimpleDialogPositiveClick(String taskName, String dueDate) {
         ContentValues values = new ContentValues();
         values.put(TaskDB.COLUMN_NAME_ENTRY_ID,taskName);
         values.put(TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
@@ -263,18 +259,31 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener{
                 TaskDB.TABLE_NAME,
                 null,
                 values);
-
         tasksUpdated();
     }
 
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
-
-    }
 
     @Override
-    public void onAdvancedDialogPositiveClick(DialogFragment simpleDialog, DialogFragment advancedDialog){
-        Log.d("YourTag", "it made it here!");
+    public void onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins){
+        ContentValues values = new ContentValues();
+        values.put(TaskDB.COLUMN_NAME_ENTRY_ID,taskName);
+        values.put(TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
+        values.put(TaskDB.COLUMN_NAME_CHECKED, 0);
+
+        //hook if row id is needed later
+        //might be good to have function
+        // that only updates the newly created task
+        long newRowId;
+        newRowId = dbW.insert(
+                TaskDB.TABLE_NAME,
+                null,
+                values);
+        tasksUpdated();
     }
+
+
+
+
+
 
 }
