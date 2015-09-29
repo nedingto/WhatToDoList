@@ -5,10 +5,18 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.SimpleCursorAdapter;
+
+import java.util.ArrayList;
 
 /**
  * Created by Nick on 9/24/2015.
@@ -33,17 +41,30 @@ public class advancedCreateTaskDialog extends DialogFragment {
                         String taskName = args.getString("task_name");
                         String dueDate = args.getString("due_date");
 
-                        AlertDialog d = (AlertDialog)dialog;
+                        AlertDialog d = (AlertDialog) dialog;
                         //This finds the views for the entry fields and sends them, along with the bundled
                         //info as parameters to the main activity
                         //category must be created
-                        int priority = (int)(((RatingBar)d.findViewById(R.id.ratingBar)).getRating());
-                        int estimatedMins = new Integer(((EditText)d.findViewById(R.id.editText2)).getText().toString());
-                        mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority, estimatedMins);
+                        int priority = (int) (((RatingBar) d.findViewById(R.id.ratingBar)).getRating());
+                        int estimatedMins = new Integer(((EditText) d.findViewById(R.id.editText2)).getText().toString());
+
+                        ExpandableListView listView = ((ExpandableListView) d.findViewById(R.id.expandableListView2));
+
+                        ArrayList<String> categories = new ArrayList<String>();
+                        for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+                            CheckBox cb = (CheckBox) listView.getAdapter().getItem(i);
+                            if (cb.isChecked()) {
+                                categories.add(cb.getText().toString());
+                            }
+                        }
+
+                        mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority, estimatedMins, categories);
+
+
                     }
                 })
                 .setNeutralButton(R.string.edit, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id){
+                    public void onClick(DialogInterface dialog, int id) {
 
                     }
                 })
@@ -52,12 +73,38 @@ public class advancedCreateTaskDialog extends DialogFragment {
                         // User cancelled the dialog so do nothing
                     }
                 });
+
         // Create the AlertDialog object and return it
-        return builder.create();
+        AlertDialog alert = builder.create();
+        populateCategoryList();
+        return alert;
     }
 
+    private void populateCategoryList(){
+        String[] projection = {
+                TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME
+        };
+        String sortOrder =
+                TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME + " DESC";
+
+        Cursor cursor = ((MainToDo)getActivity()).dbR.query(
+                TaskDBContract.TaskDB.CATEGORY_TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        int[] toViewIds = {R.id.checkBox10};
+        SimpleCursorAdapter simpleCursorAdapter = new SimpleCursorAdapter(getActivity(),R.layout.advanced_create_task_dialog, cursor, projection, toViewIds, 0);
+        ListView listView = (ListView) getDialog().findViewById(R.id.expandableListView2);
+        listView.setAdapter(simpleCursorAdapter);
+
+    }
     public interface AdvancedCreateTaskListener {
-        public void onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins);
+        public void onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins, ArrayList<String> categories);
     }
 
 

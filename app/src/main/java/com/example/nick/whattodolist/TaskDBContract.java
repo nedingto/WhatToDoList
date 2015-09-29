@@ -15,13 +15,20 @@ public class TaskDBContract {
 
     /* Inner class that defines the table contents */
     public static abstract class TaskDB implements BaseColumns {
-        public static final String TABLE_NAME = "tasks";
-        public static final String COLUMN_NAME_ENTRY_ID = "taskid";
-        public static final String COLUMN_NAME_TITLE = "title";
-        public static final String COLUMN_NAME_DUE_DATE = "duedate";
+        public static final String TASK_TABLE_NAME = "tasks";
+        public static final String COLUMN_NAME_TASK_NAME = "task_name";
+        public static final String COLUMN_NAME_DUE_DATE = "due_date";
         public static final String COLUMN_NAME_CHECKED = "checked";
         public static final String COLUMN_NAME_PRIORITY = "priority";
-        public static final String COLUMN_NAME_ESTIMATED_MINS = "estimatedMins";
+        public static final String COLUMN_NAME_ESTIMATED_MINS = "estimated_mins";
+
+        public static final String CATEGORY_TABLE_NAME = "category_name";
+        public static final String COLUMN_NAME_CATEGORY_NAME = "category";
+
+        public static final String TASK_CATEGORY_TABLE_NAME = "task_category";
+        public static final String COLUMN_NAME_TASK_ID = "task_id";
+        public static final String COLUMN_NAME_CATEGORY_ID = "category_id";
+
 
 
     }

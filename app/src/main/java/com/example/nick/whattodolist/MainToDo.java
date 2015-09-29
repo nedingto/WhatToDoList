@@ -2,6 +2,7 @@ package com.example.nick.whattodolist;
 
 import java.security.AccessController;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -191,7 +192,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
     public void tasksUpdated(){
         //query creation
         String[] projection = {
-                TaskDB.COLUMN_NAME_ENTRY_ID,
+                TaskDB.COLUMN_NAME_TASK_NAME,
                 TaskDB.COLUMN_NAME_DUE_DATE,
                 TaskDB.COLUMN_NAME_CHECKED,
                 TaskDB.COLUMN_NAME_PRIORITY,
@@ -201,7 +202,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
                 "date(" + TaskDB.COLUMN_NAME_DUE_DATE + ") DESC";
 
         Cursor c = dbR.query(
-                TaskDB.TABLE_NAME,  // The table to query
+                TaskDB.TASK_TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
                 null,                                // The columns for the WHERE clause
                 null,                            // The values for the WHERE clause
@@ -225,7 +226,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
             tr.addView(cb);
             tr.addView(tv1);
             tr.addView(tv2);
-            tv1.setText(c.getString(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_ENTRY_ID)));
+            tv1.setText(c.getString(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_TASK_NAME)));
 
             //text field for due date, will likely be displayed in a different way in final
             tv2.setText(c.getString(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_DUE_DATE)));
@@ -256,7 +257,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
                     break;
             }
 
-            //feild for the estimated time to complete, will likely not be displayed in final
+            //field for the estimated time to complete, will likely not be displayed in final
             int estimatedMins = c.getInt(c.getColumnIndexOrThrow((TaskDB.COLUMN_NAME_ESTIMATED_MINS)));
             if(estimatedMins >0) {
                 TextView tv3 = new TextView(getApplication());
@@ -283,7 +284,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
     @Override
     public void onSimpleDialogPositiveClick(String taskName, String dueDate) {
         ContentValues values = new ContentValues();
-        values.put(TaskDB.COLUMN_NAME_ENTRY_ID,taskName);
+        values.put(TaskDB.COLUMN_NAME_TASK_NAME,taskName);
         values.put(TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
         values.put(TaskDB.COLUMN_NAME_CHECKED, 0);
 
@@ -292,17 +293,19 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
         // that only updates the newly created task
         long newRowId;
         newRowId = dbW.insert(
-                TaskDB.TABLE_NAME,
+                TaskDB.TASK_TABLE_NAME,
                 null,
                 values);
+
+
         tasksUpdated();
     }
 
 
     @Override
-    public void onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins){
+    public void onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins, ArrayList<String> categories){
         ContentValues values = new ContentValues();
-        values.put(TaskDB.COLUMN_NAME_ENTRY_ID,taskName);
+        values.put(TaskDB.COLUMN_NAME_TASK_NAME,taskName);
         values.put(TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
         values.put(TaskDB.COLUMN_NAME_CHECKED, 0);
         values.put(TaskDB.COLUMN_NAME_PRIORITY, priority);
@@ -310,11 +313,58 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
         //hook if row id is needed later
         //might be good to have function
         // that only updates the newly created task
-        long newRowId;
-        newRowId = dbW.insert(
-                TaskDB.TABLE_NAME,
+        long newTaskRowId;
+        newTaskRowId = dbW.insert(
+                TaskDB.TASK_TABLE_NAME,
                 null,
                 values);
+
+        String[] projection = {
+                TaskDB._ID,
+                TaskDB.COLUMN_NAME_CATEGORY_NAME
+        };
+
+
+        for(int i = 0; i < categories.size();i++){
+            Cursor c = dbR.query(
+                    TaskDB.CATEGORY_TABLE_NAME,  // The table to query
+                    projection,                               // The columns to return
+                    TaskDB.COLUMN_NAME_CATEGORY_NAME,                                // The columns for the WHERE clause
+                    new String[] {categories.get(i)},                            // The values for the WHERE clause
+                    null,                                     // don't group the rows
+                    null,                                     // don't filter by row groups
+                    null                                 // The sort order
+            );
+            if(c.getCount() > 0){
+                c.moveToFirst();
+                int categoryRowId = c.getInt(c.getColumnIndexOrThrow(TaskDB._ID));
+                values = new ContentValues();
+                values.put(TaskDB.COLUMN_NAME_TASK_ID, newTaskRowId);
+                values.put(TaskDB.COLUMN_NAME_CATEGORY_ID, categoryRowId);
+                long newTaskCategoryRowId = dbW.insert(
+                        TaskDB.TASK_CATEGORY_TABLE_NAME,
+                        null,
+                        values
+                );
+
+            }else{
+                values = new ContentValues();
+                values.put(TaskDB.COLUMN_NAME_CATEGORY_NAME, categories.get(i));
+                long newCategoryRowId = dbW.insert(
+                        TaskDB.CATEGORY_TABLE_NAME,
+                        null,
+                        values
+                );
+                values = new ContentValues();
+                values.put(TaskDB.COLUMN_NAME_TASK_ID, newTaskRowId);
+                values.put(TaskDB.COLUMN_NAME_CATEGORY_ID, newCategoryRowId);
+                long newTaskCategoryRowId = dbW.insert(
+                        TaskDB.TASK_CATEGORY_TABLE_NAME,
+                        null,
+                        values
+                );
+            }
+        }
         tasksUpdated();
     }
 
