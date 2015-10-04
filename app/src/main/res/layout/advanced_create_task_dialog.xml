@@ -38,11 +38,44 @@
             android:id="@+id/textView9"
             android:textSize="25dp" />
 
-        <ExpandableListView
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/LinearLayout2">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/tableLayout2"></TableLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText5"
+            android:layout_weight="1" />
+
+        <Spinner
+            android:layout_width="15dp"
+            android:layout_height="25dp"
+            android:id="@+id/spinner"
+            android:spinnerMode="dropdown" />
+
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/expandableListView2" />
-
+            android:text="Add"
+            android:id="@+id/button6" />
     </LinearLayout>
 
     <LinearLayout
@@ -65,16 +98,4 @@
             android:id="@+id/editText2" />
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Make Project"
-            android:id="@+id/button5"
-            android:textSize="25dp" />
-    </LinearLayout>
 </LinearLayout>

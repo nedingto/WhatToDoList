@@ -16,6 +16,7 @@
     <string name="title_key">Title</string>
     <string name="due_date_key">Due Date</string>
 
+    <string name="Category">Category</string>
 
     <string name="action_settings">Settings</string>
 </resources>

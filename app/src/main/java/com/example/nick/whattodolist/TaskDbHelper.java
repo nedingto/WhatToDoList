@@ -40,7 +40,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
             "DROP TABLE IF EXISTS " + TaskDBContract.TaskDB.TASK_CATEGORY_TABLE_NAME;
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 9;
+    public static final int DATABASE_VERSION = 12;
     public static final String DATABASE_NAME = "Task.db";
 
     public TaskDbHelper(Context context) {
@@ -56,7 +56,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         // to simply to discard the data and start over
         db.execSQL(SQL_DELETE_TASK_TABLE);
         db.execSQL(SQL_DELETE_CATEGORY_TABLE);
-        db.execSQL(SQL_CREATE_TASK_CATEGORY_TABLE);
+        db.execSQL(SQL_DELETE_TASK_CATEGORY_TABLE);
         onCreate(db);
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {

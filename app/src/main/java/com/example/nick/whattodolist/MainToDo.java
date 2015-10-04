@@ -35,6 +35,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+
+
 import com.example.nick.whattodolist.TaskDBContract.TaskDB;
 
 public class MainToDo extends AppCompatActivity
@@ -53,7 +55,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    ViewPager mViewPager;
+
 
     TaskDBContract dbContract;
     TaskDbHelper mDbHelper;
@@ -65,24 +67,22 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
     protected void onCreate(Bundle savedInstanceState) {
         dbContract = new TaskDBContract();
         mDbHelper = new TaskDbHelper(getApplicationContext());
+
+        //set up reader and writer
         dbR = mDbHelper.getReadableDatabase();
         dbW = mDbHelper.getWritableDatabase();
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_to_do);
+        setContentView(R.layout.fragment_main_to_do);
 
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+
 
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -105,7 +105,6 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
 
         return super.onOptionsItemSelected(item);
     }
-
 
 
     /**
@@ -236,6 +235,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
             } else cb.setChecked(false);
 
             //switch to color the row based on priority
+            //TODO cahnge colors and make default
             int priority = c.getInt(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_PRIORITY));
             switch(priority) {
                 case 1:
@@ -273,8 +273,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
     }
 
 
-    /*reactions to creating task dialog*/
-
+    /*reactions to creating task button*/
     public void createTask(View v){
         DialogFragment newFragment = new simpleCreateTaskDialog();
         newFragment.show(getFragmentManager(), "create task");
@@ -304,32 +303,40 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
 
     @Override
     public void onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins, ArrayList<String> categories){
+        //set up all value for advance task
         ContentValues values = new ContentValues();
         values.put(TaskDB.COLUMN_NAME_TASK_NAME,taskName);
         values.put(TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
         values.put(TaskDB.COLUMN_NAME_CHECKED, 0);
         values.put(TaskDB.COLUMN_NAME_PRIORITY, priority);
         values.put(TaskDB.COLUMN_NAME_ESTIMATED_MINS, estimatedMins);
+
         //hook if row id is needed later
         //might be good to have function
-        // that only updates the newly created task
+        //that only updates the newly created task
         long newTaskRowId;
         newTaskRowId = dbW.insert(
                 TaskDB.TASK_TABLE_NAME,
                 null,
                 values);
 
+
+
+        //check if a category exists
+        //if not create it
+        //then add it to the task_category table with keys from both
         String[] projection = {
                 TaskDB._ID,
                 TaskDB.COLUMN_NAME_CATEGORY_NAME
         };
 
-
+        //if the category exists, just add its id and the tasks id to the task_category table
+        //otherwise create the category and then add their ids
         for(int i = 0; i < categories.size();i++){
             Cursor c = dbR.query(
                     TaskDB.CATEGORY_TABLE_NAME,  // The table to query
                     projection,                               // The columns to return
-                    TaskDB.COLUMN_NAME_CATEGORY_NAME,                                // The columns for the WHERE clause
+                    TaskDB.COLUMN_NAME_CATEGORY_NAME + "=?",                                // The columns for the WHERE clause
                     new String[] {categories.get(i)},                            // The values for the WHERE clause
                     null,                                     // don't group the rows
                     null,                                     // don't filter by row groups
@@ -367,6 +374,13 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
         }
         tasksUpdated();
     }
+
+
+
+
+
+
+
 
 
 
