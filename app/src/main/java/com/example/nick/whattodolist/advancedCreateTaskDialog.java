@@ -65,7 +65,7 @@ public class advancedCreateTaskDialog extends DialogFragment{
                         int estimatedMins = new Integer(((EditText) d.findViewById(R.id.editText2)).getText().toString());
 
                         //categories come from the category array
-                        mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority, estimatedMins, fragment.getSelected());
+                        mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority, estimatedMins, fragment.getAdded());
 
                     }
                 })

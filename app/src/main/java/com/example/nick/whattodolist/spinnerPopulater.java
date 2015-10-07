@@ -36,11 +36,13 @@ public abstract class spinnerPopulater extends Fragment
     SQLiteDatabase dbR;
     boolean freeForm = true;
 
+    //Flags if the field had been updated
+    boolean feildChanged = false;
+
     View view;
 
-
-    ArrayList<String> selected = new ArrayList<>();
-
+    ArrayList<String> selectedOld = new ArrayList<>();
+    ArrayList<String> selectedNew = new ArrayList<>();
 
    @Override
    public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,6 +62,7 @@ public abstract class spinnerPopulater extends Fragment
            public void onClick(View v) {
                String toAdd = ((EditText) getView().findViewById(R.id.editText5)).getText().toString();
                addSelected(toAdd);
+               feildChanged = true;
            }
        });
 
@@ -113,8 +116,8 @@ public abstract class spinnerPopulater extends Fragment
 
     //on button click for the add button, adds the button to the list view
     private void addSelected(String toAdd){
-        if(selected.contains(toAdd)) return;
-        selected.add(toAdd);
+        if(selectedNew.contains(toAdd)) return;
+        selectedNew.add(toAdd);
         TableLayout selectedLayout = (TableLayout)getView().findViewById(R.id.selectedLayout);
         TableRow newLayout = new TableRow(getActivity());
         TextView newTextView = new TextView(getActivity());
@@ -125,11 +128,13 @@ public abstract class spinnerPopulater extends Fragment
         newButton.setRight(0);
         newButton.setOnClickListener(new View.OnClickListener() {
 
+            //button used to delete field
             @Override
             public void onClick(View v) {
-                selected.remove((String) v.getTag());
+                selectedNew.remove((String) v.getTag());
                 ViewParent parent = v.getParent();
                 ((ViewGroup) parent.getParent()).removeView((View) parent);
+                feildChanged = true;
             }
         });
         newLayout.addView(newTextView);
@@ -154,18 +159,34 @@ public abstract class spinnerPopulater extends Fragment
     }
 
     //returns all of the selected entries
-    public ArrayList<String> getSelected(){
-        return selected;
+    public ArrayList<String> getDeleted(){
+        ArrayList<String> deleted = selectedOld;
+        deleted.removeAll(selectedNew);
+        return deleted;
+    }
+
+    public ArrayList<String> getAdded(){
+        ArrayList<String> added = selectedNew;
+        added.removeAll(selectedOld);
+        return added;
     }
 
     //can populate the selected entries if some already exist
     public void setSelected(ArrayList<String> s){
         ((ViewGroup)getView().findViewById(R.id.selectedLayout)).removeAllViews();
-        selected.clear();
-        for(String selection : s){
+        //the new start state is the entered state
+        selectedOld = s;
+
+        //add all from start state
+        selectedNew.clear();
+        for(String selection : selectedOld){
             addSelected(selection);
         }
 
+    }
+
+    public boolean fieldHasChanged(){
+        return feildChanged;
     }
 
     //the must be implemented to return db names
