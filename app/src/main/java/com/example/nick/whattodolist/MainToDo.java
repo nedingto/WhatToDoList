@@ -9,6 +9,7 @@ import java.util.Locale;
 
 import android.app.DialogFragment;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -28,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.view.View.OnLongClickListener;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -80,7 +82,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-
+        tasksUpdated();
 
     }
 
@@ -182,7 +184,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
         @Override
         public void onActivityCreated(Bundle savedInstance){
             super.onActivityCreated(savedInstance);
-            ((MainToDo)getActivity()).tasksUpdated();
+
         }
 
     }
@@ -191,6 +193,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
     public void tasksUpdated(){
         //query creation
         String[] projection = {
+                TaskDB._ID,
                 TaskDB.COLUMN_NAME_TASK_NAME,
                 TaskDB.COLUMN_NAME_DUE_DATE,
                 TaskDB.COLUMN_NAME_CHECKED,
@@ -265,6 +268,18 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
                 tr.addView(tv3);
             }
             tl.addView(tr);
+
+            tr.setTag(c.getString(c.getColumnIndex(TaskDB._ID)));
+
+            tr.setOnLongClickListener( new View.OnLongClickListener() {
+                                          @Override
+                                         public boolean onLongClick(View v){
+                                              Intent myIntent = new Intent(MainToDo.this,EditTaskActivity.class);
+                                              myIntent.putExtra("taskId", (String)v.getTag()); //Optional parameters
+                                              MainToDo.this.startActivity(myIntent);
+                                             return false;
+                                          }
+            });
 
             c.moveToNext();
 

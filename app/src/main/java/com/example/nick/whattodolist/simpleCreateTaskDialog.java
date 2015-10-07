@@ -29,7 +29,7 @@ public class simpleCreateTaskDialog extends DialogFragment {
                 .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //create the task
-                        String taskName = ((EditText)((AlertDialog) dialog).findViewById(R.id.editText)).getText().toString();
+                        String taskName = ((EditText)((AlertDialog) dialog).findViewById(R.id.editText6)).getText().toString();
                         DatePicker dp = (DatePicker) ((AlertDialog) dialog).findViewById(R.id.datePicker);
                         String dueDate = dp.getYear() + "-" + (dp.getMonth() + 1) + "-" + dp.getDayOfMonth() + " 00:00:00";
                         mListener.onSimpleDialogPositiveClick(taskName, dueDate);
@@ -41,7 +41,7 @@ public class simpleCreateTaskDialog extends DialogFragment {
                         //Might be useful to have this somehow happen beforehand so it can also be
                         //the arguments pass for the onPositive click function
                         Bundle args = new Bundle();
-                        String taskName = ((EditText) ((AlertDialog) dialog).findViewById(R.id.editText)).getText().toString();
+                        String taskName = ((EditText) ((AlertDialog) dialog).findViewById(R.id.editText6)).getText().toString();
                         DatePicker dp = (DatePicker) ((AlertDialog) dialog).findViewById(R.id.datePicker);
                         String dueDate = dp.getYear() + "-" + (dp.getMonth() + 1) + "-" + dp.getDayOfMonth() + " 00:00:00";
                         //should be a better way of making sure these key names stay consistent

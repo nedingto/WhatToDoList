@@ -4,51 +4,40 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.ContentValues;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RatingBar;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import junit.framework.Assert;
-
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
 /**
  * Created by Nick on 9/24/2015.
  */
-public class advancedCreateTaskDialog extends DialogFragment
-        implements AdapterView.OnItemSelectedListener {
+public class advancedCreateTaskDialog extends DialogFragment{
 
     //pre-made category list for the categories displayed
-    ArrayList<String> categories = new ArrayList<String>();
-
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.advanced_create_task_dialog, null);
+        final spinnerPopulater fragment = (spinnerPopulater) getFragmentManager().findFragmentById(R.id.spinner_fragment);
 
 
 
@@ -76,13 +65,14 @@ public class advancedCreateTaskDialog extends DialogFragment
                         int estimatedMins = new Integer(((EditText) d.findViewById(R.id.editText2)).getText().toString());
 
                         //categories come from the category array
-                        mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority, estimatedMins, categories);
+                        mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority, estimatedMins, fragment.getSelected());
 
                     }
                 })
                 .setNeutralButton(R.string.edit, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //this will eventually call the edit function
+
 
                     }
                 })
@@ -96,95 +86,12 @@ public class advancedCreateTaskDialog extends DialogFragment
         AlertDialog alert = builder.create();
 
 
-        //TODO create delete buttons
-
-        //set up the button to add categories
-        Button btn = (Button)dialogView.findViewById(R.id.button6);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String toAdd = ((EditText)dialogView.findViewById(R.id.editText5)).getText().toString();
-                addCategory(toAdd,dialogView);
-
-
-            }
-        });
-
-        //set up category spinner, the width is such that only the down arrow shows
-        populateCategoryList(dialogView);
-        Spinner spinner = (Spinner)dialogView.findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(this);
-
         return alert;
     }
 
     //interface for implementation by the main activity
     public interface AdvancedCreateTaskListener {
         public void onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins, ArrayList<String> categories);
-    }
-
-    //function that fills the spinner with categories from the DB by giving it an adapter
-    private void populateCategoryList(View dialogView){
-        //set query variables
-        String[] projection = {
-                TaskDBContract.TaskDB._ID,
-                TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME
-        };
-
-        String[] fromColumn = {
-                TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME
-        };
-
-        //get reader from the main activity
-        Cursor cursor = ((MainToDo)getActivity()).dbR.query(
-                TaskDBContract.TaskDB.CATEGORY_TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
-
-        //give the adater views to populate into and where it will access values and set it up with the spinner
-        int[] toViewIds = {R.id.checkBox10};
-        SimpleCursorAdapter simpleCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.category_layout,  cursor, fromColumn, toViewIds, 0);
-        Spinner spinner = (Spinner) dialogView.findViewById(R.id.spinner);
-        spinner.setAdapter(simpleCursorAdapter);
-
-    }
-
-
-
-    //adds a category to the view and to the list of categories
-    public ArrayList<String> addCategory(String toAdd, View dialogView){
-        if(categories.contains(toAdd)) return categories;
-        categories.add(toAdd);
-
-        TableLayout tl = (TableLayout)dialogView.findViewById(R.id.tableLayout2);
-        TableRow tr = new TableRow(getActivity());
-        TextView textView = new TextView(getActivity());
-        textView.setText(toAdd);
-        tr.addView(textView);
-        tl.addView(tr);
-        return categories;
-    }
-
-
-
-    //populates the edit text based on selection from spinner
-    public void onItemSelected(AdapterView<?> parent, View view,
-                               int pos, long id) {
-        Cursor c = (Cursor)parent.getItemAtPosition(pos);
-        String text = c.getString(c.getColumnIndex(TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME));
-        EditText editText = (EditText)getDialog().findViewById(R.id.editText5);
-        editText.setText(text);
-
-    }
-
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Nothing will happen
-
     }
 
     // Use this instance of the interface to deliver action events
@@ -203,6 +110,14 @@ public class advancedCreateTaskDialog extends DialogFragment
             throw new ClassCastException(activity.toString()
                     + " must implement NoticeDialogListener");
         }
+    }
+    public void onDestroyView() {
+        super.onDestroyView();
+        FragmentManager fm = getActivity().getFragmentManager();
+        Fragment fragment = (fm.findFragmentById(R.id.spinner_fragment));
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.remove(fragment);
+        ft.commit();
     }
 
 }
