@@ -21,6 +21,7 @@ public class TaskDBContract {
         public static final String COLUMN_NAME_CHECKED = "checked";
         public static final String COLUMN_NAME_PRIORITY = "priority";
         public static final String COLUMN_NAME_ESTIMATED_MINS = "estimated_mins";
+        public static final String COLUMN_NAME_REPEATING_BASIS = "repeating_basis";
 
         public static final String CATEGORY_TABLE_NAME = "category_name";
         public static final String COLUMN_NAME_CATEGORY_NAME = "category";
@@ -29,8 +30,20 @@ public class TaskDBContract {
         public static final String COLUMN_NAME_TASK_ID = "task_id";
         public static final String COLUMN_NAME_CATEGORY_ID = "category_id";
 
-
-
+        public static final String REPEATING_TABLE_NAME ="repeating";
+        public static final String COLUMN_NAME_PERIODICAL_NUM = "periodical_num";
+        public static final String COLUMN_NAME_PERIODICAL_PERIOD = "periodical_period";
+        public static final String COLUMN_NAME_ORDINAL_NUM = "ordinal_num";
+        public static final String COLUMN_NAME_ORDINAL_PERIOD = "ordinal_period";
+        public static final String COLUMN_NAME_SUNDAY = "sunday";
+        public static final String COLUMN_NAME_MONDAY = "monday";
+        public static final String COLUMN_NAME_TUESDAY = "tuesday";
+        public static final String COLUMN_NAME_WEDNESDAY = "wednesday";
+        public static final String COLUMN_NAME_THURSDAY = "thursday";
+        public static final String COLUMN_NAME_FRIDAY = "friday";
+        public static final String COLUMN_NAME_SATURDAY = "saturday";
+        public static final String COLUMN_NAME_START_DATE = "start_date";
+        public static final String COLUMN_NAME_END_DATE = "end_date";
     }
 
 

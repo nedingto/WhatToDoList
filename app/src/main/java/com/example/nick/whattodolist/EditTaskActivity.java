@@ -1,51 +1,69 @@
 package com.example.nick.whattodolist;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.ContentValues;
+import android.app.DatePickerDialog;
+import android.app.DialogFragment;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import junit.framework.Assert;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 
-public class EditTaskActivity extends AppCompatActivity {
+public class EditTaskActivity extends AppCompatActivity
+        implements cascadeChangesDialog.cascadeChangesDialogListener,
+        createRepeatingDialog.RepeatingCreateTaskListener,
+        discardChangesDialog.discardChangesDialogListener,
+        confirmBasisChangeDialog.confirmationBasisChangeDialogListener,
+        cascadeDeleteDialog.cascadeDeleteDialogListener{
 
-
-    TaskDBContract dbContract;
-    TaskDbHelper mDbHelper;
-    SQLiteDatabase dbR;
-    SQLiteDatabase dbW;
+    //id of the current task
     int taskId;
 
+    //repeating basis bundle, may be empty if there is none
+    Bundle basisBundle = new Bundle();
+    boolean isRepeating = false;
 
+    //editors to preform task operations
+    TaskEditor taskEditor;
+    RepeatingBasisEditor repeatingBasisEditor;
+
+    spinnerPopulater fragment;
+
+    //fields to be gathered
+    int repeatingId;
+    String taskName;
+    String dueDate;
+    int priority;
+    int checked;
+    int estimation;
+    ArrayList<String> added;
+    ArrayList<String> deleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_task);
-        dbContract = new TaskDBContract();
-        mDbHelper = new TaskDbHelper(getApplicationContext());
 
-        //set up reader and writer
-        dbR = mDbHelper.getReadableDatabase();
-        dbW = mDbHelper.getWritableDatabase();
+        //initialize the editors
+        taskEditor = new TaskEditor(getApplicationContext());
+        repeatingBasisEditor = new RepeatingBasisEditor(getApplicationContext());
+
         Intent intent = getIntent();
         String value = intent.getStringExtra("taskId");
 
         //fill all the fields
         populateEdit(value);
+
+        //initialize field values
+        gatherFields();
     }
 
     @Override
@@ -56,194 +74,166 @@ public class EditTaskActivity extends AppCompatActivity {
     }
 
     public void populateEdit(String id) {
-        //query creation
-        String[] projection = {
-                TaskDBContract.TaskDB._ID,
-                TaskDBContract.TaskDB.COLUMN_NAME_TASK_NAME,
-                TaskDBContract.TaskDB.COLUMN_NAME_DUE_DATE,
-                TaskDBContract.TaskDB.COLUMN_NAME_CHECKED,
-                TaskDBContract.TaskDB.COLUMN_NAME_PRIORITY,
-                TaskDBContract.TaskDB.COLUMN_NAME_ESTIMATED_MINS
-        };
-
-        String[] ID = {id};
-        Cursor c = dbR.query(
-                TaskDBContract.TaskDB.TASK_TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                TaskDBContract.TaskDB._ID + "=?",                                // The columns for the WHERE clause
-                ID,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                // The sort order
-        );
-        c.moveToFirst();
-        //should assert that c is not after last, also there should only be one
+        Bundle taskBundle = taskEditor.getTask(id);
 
         //set taskId
-        taskId = c.getInt(c.getColumnIndex(TaskDBContract.TaskDB._ID));
+        taskId = Integer.parseInt(id);
+
+        //set the checked value
+        CheckBox checkBox = ((CheckBox)findViewById(R.id.checkBox11));
+        checkBox.setChecked(taskBundle.getInt(TaskEditor.BUNDLE_CHECKED) != 0);
 
         //set title
         EditText title = ((EditText) findViewById(R.id.editText));
-        title.setText(c.getString(c.getColumnIndex(TaskDBContract.TaskDB.COLUMN_NAME_TASK_NAME)));
+        title.setText(taskBundle.getString(TaskEditor.BUNDLE_TASK_NAME));
 
-        //set due date
+        //set due date, and format it
         TextView dueDate = ((TextView) findViewById(R.id.textView21));
-        dueDate.setText(c.getString(c.getColumnIndex(TaskDBContract.TaskDB.COLUMN_NAME_DUE_DATE)));
+        String dueDateText = taskBundle.getString(TaskEditor.BUNDLE_DUE_DATE);
+        dueDate.setText(dateConverter.sqlToString(dueDateText));
 
         //set priority
         RatingBar priority = ((RatingBar) findViewById(R.id.ratingBar));
-        priority.setRating(c.getInt(c.getColumnIndex(TaskDBContract.TaskDB.COLUMN_NAME_PRIORITY)));
+        priority.setRating(taskBundle.getInt(TaskEditor.BUNDLE_PRIORITY));
 
         //set estimated mins
         EditText estimatedMin = ((EditText) findViewById(R.id.editText2));
-        estimatedMin.setText(c.getString(c.getColumnIndex(TaskDBContract.TaskDB.COLUMN_NAME_ESTIMATED_MINS)));
+        estimatedMin.setText(String.valueOf(taskBundle.getInt(TaskEditor.BUNDLE_ESTIMATION)));
 
-        //TODO make field for checked
+        //make the repeating bundle in case the basis button is clicked
+        repeatingId = taskBundle.getInt(TaskEditor.BUNDLE_BASIS_ID);
+        basisBundle = repeatingBasisEditor.getBasis(repeatingId);
 
-        String table = TaskDBContract.TaskDB.CATEGORY_TABLE_NAME +
-                " INNER JOIN " + TaskDBContract.TaskDB.TASK_CATEGORY_TABLE_NAME +
-                " ON " +  TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_ID + " = " +
-                TaskDBContract.TaskDB.CATEGORY_TABLE_NAME + "."
-                + TaskDBContract.TaskDB._ID;
-
-        projection = new String[]{
-                TaskDBContract.TaskDB.COLUMN_NAME_TASK_ID,
-                TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME
-        };
-
-        ID = new String[]{id};
-        Cursor c2 = dbR.query(
-                table,  // The table to query
-                projection,                               // The columns to return
-                TaskDBContract.TaskDB.COLUMN_NAME_TASK_ID + "=?",                                // The columns for the WHERE clause
-                ID,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                // The sort order
-        );
-        c2.moveToFirst();
-
-        ArrayList<String> list = new ArrayList<>();
-        while(!c2.isAfterLast()){
-            list.add(c2.getString(c2.getColumnIndex(TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME)));
-            c2.moveToNext();
+        //decide whether or not there are others with the same basis
+        if(repeatingId != -1){
+            isRepeating = true;
+            TextView recurringIndicator = ((TextView) findViewById((R.id.textView26)) );
+            recurringIndicator.setText("Yes");
         }
 
-        final spinnerPopulater fragment = (spinnerPopulater) getFragmentManager().findFragmentById(R.id.spinner_fragment);
-        fragment.setSelected(list);
-
-        //TODO check if there is a need to close the cursor
+        fragment = (spinnerPopulater) getFragmentManager().findFragmentById(R.id.spinner_fragment);
+        fragment.setSelected(taskEditor.getCategories(id));
     }
 
-    public void saveClicked(View v) {
-        final spinnerPopulater fragment = (spinnerPopulater) getFragmentManager().findFragmentById(R.id.spinner_fragment);
-        ContentValues values = new ContentValues();
-        String titleString;
-        String dueDateString;
-        int priorityInt;
-        int checkedInt;
-        int estimationInt;
-
-        titleString = ((EditText) v.getRootView().findViewById(R.id.editText)).getText().toString();
-        dueDateString = ((TextView) v.getRootView().findViewById(R.id.textView21)).getText().toString();
-        priorityInt = (int)((RatingBar) v.getRootView().findViewById(R.id.ratingBar)).getRating();
-        checkedInt = 0;
-        estimationInt = Integer.parseInt(((EditText) v.getRootView().findViewById(R.id.editText2)).getText().toString());
-
-        values.put(TaskDBContract.TaskDB.COLUMN_NAME_TASK_NAME, titleString);
-        values.put(TaskDBContract.TaskDB.COLUMN_NAME_DUE_DATE, dueDateString);
-        values.put(TaskDBContract.TaskDB.COLUMN_NAME_PRIORITY, priorityInt);
-        values.put(TaskDBContract.TaskDB.COLUMN_NAME_ESTIMATED_MINS, estimationInt);
-        values.put(TaskDBContract.TaskDB.COLUMN_NAME_CHECKED, checkedInt);
-
-        String selection = TaskDBContract.TaskDB._ID+ " LIKE ?";
-        String[] selectionArgs = { String.valueOf(taskId) };
-
-        int cout = dbR.update(
-                TaskDBContract.TaskDB.TASK_TABLE_NAME,
-                values,
-                selection,
-                selectionArgs
-        );
-
-        ArrayList<String> deleted = fragment.getDeleted();
-        ArrayList<String> added = fragment.getAdded();
-        if (!deleted.isEmpty()) {
-            //set up the field
-
-            String table = TaskDBContract.TaskDB.CATEGORY_TABLE_NAME +
-                    " INNER JOIN " + TaskDBContract.TaskDB.TASK_CATEGORY_TABLE_NAME +
-                    " ON (" + TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_ID + " = " +
-                    TaskDBContract.TaskDB.CATEGORY_TABLE_NAME + "."
-                    + TaskDBContract.TaskDB._ID + ")";
-
-            selection = TaskDBContract.TaskDB.COLUMN_NAME_TASK_ID + " = " + taskId + " AND (";
-            for (int i = 0; i < deleted.size(); i++) {
-                selection += TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME + " = '";
-                selection += deleted.get(i);
-                if (i < deleted.size() - 1) selection += "' OR ";
-            }
-            selection += "')";
-
-            String fullSelection = TaskDBContract.TaskDB._ID + " IN (SELECT " +
-                    TaskDBContract.TaskDB.TASK_CATEGORY_TABLE_NAME + "." +
-                    TaskDBContract.TaskDB._ID + " FROM " + table + " WHERE " + selection + ")";
-
-            dbR.delete(TaskDBContract.TaskDB.TASK_CATEGORY_TABLE_NAME, fullSelection, null);
-
-
+    /*save changes handling*/
+    public void onSaveClicked(View v) {
+        //if it is repeating, ask if the user wants the changes to go through the entire series
+        if(isRepeating) {
+            DialogFragment newFragment = new cascadeChangesDialog();
+            newFragment.show(getFragmentManager(), "cascade changes");
+        } else {
+            //if it is not repeating, just follow through as usual
+            gatherFields();
+            taskEditor.updateFields(taskName, dateConverter.stringToSql(dueDate), priority,
+                    estimation, checked, taskId);
+            taskEditor.updateCategories(added, deleted, taskId);
+            finish();
         }
-        if (!added.isEmpty()) {
-            String[] projection = {
-                    TaskDBContract.TaskDB._ID,
-                    TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME
-            };
-            //if the category exists, just add its id and the tasks id to the task_category table
-            //otherwise create the category and then add their ids
-            added = fragment.getAdded();
-            for (int i = 0; i < added.size(); i++) {
-                Cursor c = dbR.query(
-                        TaskDBContract.TaskDB.CATEGORY_TABLE_NAME,  // The table to query
-                        projection,                               // The columns to return
-                        TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME + "=?",                                // The columns for the WHERE clause
-                        new String[]{added.get(i)},                            // The values for the WHERE clause
-                        null,                                     // don't group the rows
-                        null,                                     // don't filter by row groups
-                        null                                 // The sort order
-                );
-                if (c.getCount() > 0) {
-                    c.moveToFirst();
-                    int categoryRowId = c.getInt(c.getColumnIndexOrThrow(TaskDBContract.TaskDB._ID));
-                    values = new ContentValues();
-                    values.put(TaskDBContract.TaskDB.COLUMN_NAME_TASK_ID, taskId);
-                    values.put(TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_ID, categoryRowId);
-                    long newTaskCategoryRowId = dbW.insert(
-                            TaskDBContract.TaskDB.TASK_CATEGORY_TABLE_NAME,
-                            null,
-                            values
-                    );
+    }
 
-                } else {
-                    values = new ContentValues();
-                    values.put(TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_NAME, added.get(i));
-                    long newCategoryRowId = dbW.insert(
-                            TaskDBContract.TaskDB.CATEGORY_TABLE_NAME,
-                            null,
-                            values
-                    );
-                    values = new ContentValues();
-                    values.put(TaskDBContract.TaskDB.COLUMN_NAME_TASK_ID, taskId);
-                    values.put(TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_ID, newCategoryRowId);
-                    long newTaskCategoryRowId = dbW.insert(
-                            TaskDBContract.TaskDB.TASK_CATEGORY_TABLE_NAME,
-                            null,
-                            values
-                    );
-                }
-            }
-
+    @Override
+    public void onCascadeChangesPositiveClick() {
+        //user wants to cascade to the following tasks
+        gatherFields();
+        ArrayList<Integer> taskIds;
+        taskIds = repeatingBasisEditor.getBasisTaskIds(repeatingId,
+                dateConverter.stringToSql(dueDate));
+        for (int id:taskIds){
+            //don't cascade changes made to the completion or to the due date
+            taskEditor.updateFields(taskName, null, priority, estimation, -1, id);
+            taskEditor.updateCategories(added, deleted, id);
         }
         finish();
+    }
+
+    @Override
+    public void onCascadeChangesNegativeClick() {
+        //user does not want to cascade the changes
+        gatherFields();
+        taskEditor.updateFields(taskName, dateConverter.stringToSql(dueDate),
+                priority, estimation, checked, taskId);
+        taskEditor.updateCategories(added, deleted, taskId);
+        finish();
+    }
+
+    @Override
+    public void onCascadeChangesNeutralClick() {
+        //this will apply to all tasks from the beginning of time
+        gatherFields();
+        ArrayList<Integer> taskIds;
+        taskIds = repeatingBasisEditor.getBasisTaskIds(repeatingId, dateConverter.firstDateSql);
+        for (int id:taskIds){
+            taskEditor.updateFields(taskName, null, priority, estimation, -1, id);
+
+            taskEditor.updateCategories(added, deleted, id);
+        }
+        finish();
+    }
+
+
+    /*delete handling*/
+    public void onDeleteClicked(View v){
+        //should check if the user wants this to cascade
+        if(isRepeating) {
+            DialogFragment newFragment = new cascadeDeleteDialog();
+            newFragment.show(getFragmentManager(), "delete changes");
+        } else {
+            //if it is not repeating, just delete it
+            taskEditor.deleteTask(taskId);
+            finish();
+        }
+    }
+
+    @Override
+    public void onCascadeDeletePositiveClick() {
+        ArrayList<Integer> taskIds;
+        taskIds = repeatingBasisEditor.getBasisTaskIds(repeatingId, dateConverter.stringToSql(dueDate));
+        for (int id:taskIds) {
+            taskEditor.deleteTask(id);
+        }
+        finish();
+    }
+
+    @Override
+    public void onCascadeDeleteNegativeClick() {
+        taskEditor.deleteTask(taskId);
+        finish();
+    }
+
+    @Override
+    public void onCascadeDeleteNeutralClick() {
+        //this will apply the changes to all tasks in the series
+        ArrayList<Integer> taskIds;
+        taskIds = repeatingBasisEditor.getBasisTaskIds(repeatingId, dateConverter.firstDateSql);
+        for (int id:taskIds) {
+            taskEditor.deleteTask(id);
+        }
+        finish();
+    }
+
+    public void dueDateClicked(View v){
+        //get date ints from the string to set the starting date
+        Calendar cal = dateConverter.stringToCalendar(dueDate);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePicker = new DatePickerDialog(v.getContext(), new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                Calendar cal = Calendar.getInstance();
+                cal.set(year, monthOfYear, dayOfMonth);
+                dateSet(cal);
+            }
+        }, year, month, day);
+        datePicker.show();
+    }
+
+    //handling or cahnging the due date
+    public void dateSet(Calendar cal){
+        String dateString = dateConverter.calendarToString(cal);
+        ((TextView) findViewById(R.id.textView21)).setText(dateString);
     }
 
     @Override
@@ -261,6 +251,78 @@ public class EditTaskActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void gatherFields(){
+        taskName = ((EditText)findViewById(R.id.editText)).getText().toString();
+        dueDate = ((TextView) findViewById(R.id.textView21)).getText().toString();
+        priority = (int)((RatingBar) findViewById(R.id.ratingBar)).getRating();
+        checked = ((CheckBox) findViewById(R.id.checkBox11)).isChecked()? 1 : 0;
+        estimation = Integer.parseInt(((EditText) findViewById(R.id.editText2)).getText().toString());
+        added = fragment.getAdded();
+        deleted = fragment.getDeleted();
+    }
 
+    /*All of the methods handling the repeating clicks*/
+    public void repeatingClicked(View v){
+        //first, warn the user that their changes will be discarded
+        DialogFragment saveFragment = new discardChangesDialog();
+        saveFragment.show(getFragmentManager(), "discard changes");
+    }
+
+    @Override
+    public void onDiscardChangesPositiveClick() {
+        //should show the repeating dialog, populate it if needs it
+        DialogFragment newFragment = new createRepeatingDialog();
+        newFragment.setArguments(basisBundle);
+        newFragment.show(getFragmentManager(), "edit basis");
+    }
+
+    @Override
+    public void onRepeatingDialogPositiveClick(Bundle repeatingBundle) {
+        //should give the user a final warning
+        DialogFragment commitFragment = new confirmBasisChangeDialog();
+        commitFragment.setArguments(repeatingBundle);
+        commitFragment.show(getFragmentManager(), "confirm change");
+    }
+
+    @Override
+    public void onRepeatingDialogNegativeClick() {
+        //user canceled the repeating dialog, keep good on promise to discard the changes
+        finish();
+    }
+
+    @Override
+    public void onConfirmationBasisChangePositiveClick(Bundle repeatingBundle) {
+        //should delete all of the tasks with this basis that come after the start date
+        String startDateSql = createRepeatingDialog.BUNDLE_START_DATE;
+        ArrayList<Integer> basisTaskIds = repeatingBasisEditor.getBasisTaskIds(repeatingId,
+                repeatingBundle.getString(startDateSql));
+        for(Integer id:basisTaskIds){
+            taskEditor.deleteTask(id);
+        }
+        //then delete this basis (only deletes if there are no other tasks related to it)
+        repeatingBasisEditor.deleteBasis(repeatingId);
+
+        //create the new basis
+        float basisId = repeatingBasisEditor.createBasis(
+                repeatingBundle.getInt(createRepeatingDialog.BUNDLE_PERIODICAL_NUM),
+                repeatingBundle.getInt(createRepeatingDialog.BUNDLE_PERIODICAL_PERIOD),
+                repeatingBundle.getInt(createRepeatingDialog.BUNDLE_ORDINAL_NUM),
+                repeatingBundle.getInt(createRepeatingDialog.BUNDLE_ORDINAL_PERIOD),
+                repeatingBundle.getIntArray(createRepeatingDialog.BUNDLE_DAY_OF_WEEK),
+                repeatingBundle.getString(createRepeatingDialog.BUNDLE_START_DATE),
+                repeatingBundle.getString(createRepeatingDialog.BUNDLE_END_DATE));
+        ArrayList<String> dates = repeatingBasisEditor.getBasisDates(basisId);
+        //lastly create the new tasks
+        for(String date: dates){
+            taskEditor.createTask(taskName, date, priority, estimation, (int) basisId);
+        }
+        finish();
+    }
+
+    @Override
+    public void onConfirmationBasisChangeNegativeClick() {
+        //user canceled the repeating dialog, keep good on promise to discard the changes
+        finish();
+    }
 }
 

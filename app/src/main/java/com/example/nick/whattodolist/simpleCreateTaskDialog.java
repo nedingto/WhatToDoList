@@ -7,23 +7,29 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 
+import java.util.Calendar;
+
 /**
  * Created by Nick on 9/20/2015.
  */
 public class simpleCreateTaskDialog extends DialogFragment {
+    public static String BUNDLE_TASK_NAME = "task_name";
+    public static String BUNDLE_DUE_DATE = "due_date";
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.simple_create_task_dialog, null);
 
-
-        builder.setView(inflater.inflate(R.layout.simple_create_task_dialog, null))
+        builder.setView(dialogView)
                 //setting the message appears to be causing an issue
         .setMessage(R.string.simple_create_task_dilog)
                 .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
@@ -31,7 +37,10 @@ public class simpleCreateTaskDialog extends DialogFragment {
                         //create the task
                         String taskName = ((EditText)((AlertDialog) dialog).findViewById(R.id.editText6)).getText().toString();
                         DatePicker dp = (DatePicker) ((AlertDialog) dialog).findViewById(R.id.datePicker);
-                        String dueDate = dp.getYear() + "-" + (dp.getMonth() + 1) + "-" + dp.getDayOfMonth() + " 00:00:00";
+                        //have to add some pieces to the string to use in sql database
+                        Calendar cal = Calendar.getInstance();
+                        cal.set(dp.getYear(), dp.getMonth(), dp.getDayOfMonth());
+                        String dueDate = dateConverter.calendarToString(cal);
                         mListener.onSimpleDialogPositiveClick(taskName, dueDate);
                     }
                 })
@@ -41,12 +50,18 @@ public class simpleCreateTaskDialog extends DialogFragment {
                         //Might be useful to have this somehow happen beforehand so it can also be
                         //the arguments pass for the onPositive click function
                         Bundle args = new Bundle();
+                        //TODO break the function for getting the date from the date picker out
                         String taskName = ((EditText) ((AlertDialog) dialog).findViewById(R.id.editText6)).getText().toString();
                         DatePicker dp = (DatePicker) ((AlertDialog) dialog).findViewById(R.id.datePicker);
-                        String dueDate = dp.getYear() + "-" + (dp.getMonth() + 1) + "-" + dp.getDayOfMonth() + " 00:00:00";
+
+                        Calendar cal = Calendar.getInstance();
+                        cal.set(dp.getYear(), dp.getMonth(), dp.getDayOfMonth());
+                        String dueDate = dateConverter.calendarToSql(cal);
                         //should be a better way of making sure these key names stay consistent
-                        args.putString("task_name", taskName);
-                        args.putString("due_date", dueDate);
+                        args.putString(BUNDLE_TASK_NAME, taskName);
+                        args.putString(BUNDLE_DUE_DATE, dueDate);
+
+                        //use the bundle to send to an advanced task dialog
                         DialogFragment newFragment = new advancedCreateTaskDialog();
                         newFragment.setArguments(args);
                         newFragment.show(getFragmentManager(), "create task advanced");
@@ -58,7 +73,26 @@ public class simpleCreateTaskDialog extends DialogFragment {
                     }
                 });
         // Create the AlertDialog object and return it
-        return builder.create();
+        final AlertDialog alert =  builder.create();
+
+        //make button click for the repeating button
+        Button btn = (Button)dialogView.findViewById(R.id.button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //bundle the task name and end it to a new dialog for repeating
+                Bundle args = new Bundle();
+                String taskName = ((EditText) v.getRootView().findViewById(R.id.editText6)).getText().toString();
+                args.putString(BUNDLE_TASK_NAME, taskName);
+                DialogFragment newFragment = new createRepeatingDialog();
+                newFragment.setArguments(args);
+                alert.dismiss();
+                newFragment.show(getFragmentManager(), "create repeating");
+            }
+        });
+
+        return alert;
+
     }
     public interface SimpleCreateTaskListener {
         public void onSimpleDialogPositiveClick(String taskName, String dueDate);
@@ -82,5 +116,7 @@ public class simpleCreateTaskDialog extends DialogFragment {
                     + " must implement NoticeDialogListener");
         }
     }
+
+
 
 }

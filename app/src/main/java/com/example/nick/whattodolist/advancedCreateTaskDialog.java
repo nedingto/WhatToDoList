@@ -28,52 +28,39 @@ import java.util.ArrayList;
  * Created by Nick on 9/24/2015.
  */
 public class advancedCreateTaskDialog extends DialogFragment{
+    String taskName = "";
+    String dueDate = "";
+    int priority = 1;
+    int estimation = 0;
+    Bundle basisBundle = new Bundle();
+    ArrayList<String> addedCategories = new ArrayList<>();
 
-    //pre-made category list for the categories displayed
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
-        // Use the Builder class for convenient dialog construction
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        //view to be used for this dialog
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.advanced_create_task_dialog, null);
-        final spinnerPopulater fragment = (spinnerPopulater) getFragmentManager().findFragmentById(R.id.spinner_fragment);
 
-
-
+        //build the dialog
         builder.setView(dialogView)
-                //setting the message appears to be causing an issue
                 .setMessage(R.string.advanced_create_task_dialog)
                 .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
-
                     public void onClick(DialogInterface dialog, int id) {
-                        // TODO: 9/27/2015 make title key a string resource
-                        //gets arguments bundled from the simpleCreateTaskDialog
-                        Bundle args = getArguments();
-                        String taskName = args.getString("task_name");
-                        String dueDate = args.getString("due_date");
-
-                        //Cast dialog as this dialog
-                        AlertDialog d = (AlertDialog) dialog;
-
-
-                        //This finds the views for the entry fields and sends them, along with the bundled
-                        //info as parameters to the main activity
-                        //category must be created
-                        int priority = (int) (((RatingBar) d.findViewById(R.id.ratingBar)).getRating());
-                        //TODO: fix error for crash on no int entered.
-                        int estimatedMins = new Integer(((EditText) d.findViewById(R.id.editText2)).getText().toString());
-
-                        //categories come from the category array
-                        mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority, estimatedMins, fragment.getAdded());
+                        //pull from the fields and pass the click event
+                        gatherFields();
+                        mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority,
+                                estimation, addedCategories, basisBundle);
 
                     }
                 })
                 .setNeutralButton(R.string.edit, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        //this will eventually call the edit function
-
-
+                        //pull from the fields and pass the click event
+                        gatherFields();
+                        mListener.onAdvancedDialogNeutralClick(taskName, dueDate, priority,
+                                estimation, addedCategories, basisBundle);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -83,15 +70,13 @@ public class advancedCreateTaskDialog extends DialogFragment{
                 });
 
         // Create the AlertDialog object and return it
-        AlertDialog alert = builder.create();
-
-
-        return alert;
+        return  builder.create();
     }
 
-    //interface for implementation by the main activity
+    //interface for implementation to handel events
     public interface AdvancedCreateTaskListener {
-        public void onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins, ArrayList<String> categories);
+        public long onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins, ArrayList<String> categories, Bundle repeatingBundle);
+        public void onAdvancedDialogNeutralClick(String taskName, String dueDate, int priority, int estimatedMins, ArrayList<String> categories, Bundle repeatingBundle);
     }
 
     // Use this instance of the interface to deliver action events
@@ -111,6 +96,39 @@ public class advancedCreateTaskDialog extends DialogFragment{
                     + " must implement NoticeDialogListener");
         }
     }
+
+    private void gatherFields(){
+        //gets arguments bundled from the previous dialog
+        Bundle args = getArguments();
+
+        //regardless of where it came from it should have have a task name
+        taskName = args.getString(simpleCreateTaskDialog.BUNDLE_TASK_NAME);
+
+        if (args.containsKey(simpleCreateTaskDialog.BUNDLE_DUE_DATE)) {
+            //if the bundle has due_date key, then it came from
+            //a simple create task dialog
+            dueDate = args.getString(simpleCreateTaskDialog.BUNDLE_DUE_DATE);
+        } else {
+            //otherwise leave the due date empty and set the repeating bundle
+            basisBundle = args;
+        }
+
+        //This finds the views for the entry fields and sends them, along with
+        //the bundled info
+
+        priority = (int) (((RatingBar) getDialog().findViewById(R.id.ratingBar)).getRating());
+
+        EditText editText = ((EditText) getDialog().findViewById(R.id.editText2));
+        estimation = Integer.parseInt(editText.getText().toString());
+
+        //added categories come from the spinner fragment
+        spinnerPopulater fragment = (spinnerPopulater) getFragmentManager().findFragmentById(
+                R.id.spinner_fragment);
+        addedCategories = fragment.getAdded();
+
+    }
+
+    //destroys the fragment when this closes
     public void onDestroyView() {
         super.onDestroyView();
         FragmentManager fm = getActivity().getFragmentManager();

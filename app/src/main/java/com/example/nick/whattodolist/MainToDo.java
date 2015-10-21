@@ -1,10 +1,7 @@
 package com.example.nick.whattodolist;
 
-import java.security.AccessController;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import android.app.DialogFragment;
@@ -14,14 +11,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,10 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.view.View.OnLongClickListener;
-import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -42,7 +34,8 @@ import android.widget.TextView;
 import com.example.nick.whattodolist.TaskDBContract.TaskDB;
 
 public class MainToDo extends AppCompatActivity
-implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDialog.AdvancedCreateTaskListener{
+implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDialog.AdvancedCreateTaskListener,
+createRepeatingDialog.RepeatingCreateTaskListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -58,36 +51,29 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
      * The {@link ViewPager} that will host the section contents.
      */
 
-
-    TaskDBContract dbContract;
-    TaskDbHelper mDbHelper;
-    SQLiteDatabase dbR;
-    SQLiteDatabase dbW;
-
+    //editors for the database
+    TaskEditor taskEditor;
+    RepeatingBasisEditor repeatingBasisEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        dbContract = new TaskDBContract();
-        mDbHelper = new TaskDbHelper(getApplicationContext());
-
-        //set up reader and writer
-        dbR = mDbHelper.getReadableDatabase();
-        dbW = mDbHelper.getWritableDatabase();
+        taskEditor = new TaskEditor(getApplicationContext());
+        repeatingBasisEditor = new RepeatingBasisEditor(getApplicationContext());
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_main_to_do);
 
-
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+        // this is for the pagination, might need this later
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
+        //update the tasks when this starts
         tasksUpdated();
 
     }
 
     protected void onResume(){
         super.onResume();
+        //update the tasks when it is restarted
         tasksUpdated();
     }
 
@@ -114,6 +100,7 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
     }
 
 
+    //this is for the page adapter that I may use later
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -194,101 +181,99 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
 
     }
 
-    //method to populate main view, probably should use more accurate name
+    //method to populate main view
     public void tasksUpdated(){
-        //query creation
-        String[] projection = {
-                TaskDB._ID,
-                TaskDB.COLUMN_NAME_TASK_NAME,
-                TaskDB.COLUMN_NAME_DUE_DATE,
-                TaskDB.COLUMN_NAME_CHECKED,
-                TaskDB.COLUMN_NAME_PRIORITY,
-                TaskDB.COLUMN_NAME_ESTIMATED_MINS
-        };
-        String sortOrder =
-                "date(" + TaskDB.COLUMN_NAME_DUE_DATE + ") DESC";
 
-        Cursor c = dbR.query(
-                TaskDB.TASK_TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        );
+        ArrayList<Bundle> tasks = taskEditor.getTasksDateAcceding();
 
-        //this programmatically creates the views but it might be more efficient and
-        //better practice to use a layout as a template and programmatically fill in text
+        //removes the task list and then programmatically fills it will the newest tasks
         TableLayout tl = (TableLayout)findViewById(R.id.tableLayout1);
         tl.removeAllViews();
-        c.moveToFirst();
 
-        while(!c.isAfterLast()){
+        //set a calendar to test these against, if there are past
+        Calendar today = Calendar.getInstance();
 
-            TableRow tr = new TableRow(getApplication());
-            CheckBox cb = new CheckBox(getApplication());
-            TextView tv1 = new TextView(getApplication());
-            TextView tv2 = new TextView(getApplication());
-            tr.addView(cb);
-            tr.addView(tv1);
-            tr.addView(tv2);
-            tv1.setText(c.getString(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_TASK_NAME)));
+        Calendar tmp = dateConverter.sqlToCalendar(dateConverter.firstDateSql);
 
-            //text field for due date, will likely be displayed in a different way in final
-            tv2.setText(c.getString(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_DUE_DATE)));
 
-            if(c.getInt(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_CHECKED)) == 1){
-                cb.setChecked(true);
-            } else cb.setChecked(false);
 
-            //switch to color the row based on priority
-            //TODO cahnge colors and make default
-            int priority = c.getInt(c.getColumnIndexOrThrow(TaskDB.COLUMN_NAME_PRIORITY));
-            switch(priority) {
-                case 1:
-                    tr.setBackgroundColor(Color.rgb(0, 204, 255));
-                    break;
-                case 2:
-                    tr.setBackgroundColor(Color.rgb(0, 255, 0));
-                    break;
-                case 3:
-                    tr.setBackgroundColor(Color.rgb(255, 255, 0));
-                    break;
-                case 4:
-                    tr.setBackgroundColor(Color.rgb(255, 153, 0));
-                    break;
-                case 5:
-                    tr.setBackgroundColor(Color.rgb(255, 51, 0));
-                    break;
-                default:
-                    break;
-            }
+        for(Bundle task:tasks){
+            Calendar dueDate = dateConverter.sqlToCalendar(task.getString(taskEditor.BUNDLE_DUE_DATE));
+            //act only if the task is due in the future or is past due
+            if(!dueDate.before(today) || task.getInt(taskEditor.BUNDLE_CHECKED) == 0) {
+                if(dueDate.after(tmp)){
+                    //if there is a new due date create a divider and reset tmp
+                    TableRow tr = new TableRow(getApplication());
+                    //extra space
+                    TextView line = new TextView(getApplicationContext());
+                    tr.addView(line);
+                    TextView dueText = new TextView(getApplicationContext());
+                    dueText.setText(dateConverter.calendarToString(dueDate));
+                    tr.addView(dueText);
+                    tl.addView(tr);
+                    tmp = dueDate;
+                }
 
-            //field for the estimated time to complete, will likely not be displayed in final
-            int estimatedMins = c.getInt(c.getColumnIndexOrThrow((TaskDB.COLUMN_NAME_ESTIMATED_MINS)));
-            if(estimatedMins >0) {
-                TextView tv3 = new TextView(getApplication());
-                tv3.setText(" " + estimatedMins + "mins to complete");
-                tr.addView(tv3);
-            }
-            tl.addView(tr);
-
-            tr.setTag(c.getString(c.getColumnIndex(TaskDB._ID)));
-
-            tr.setOnLongClickListener( new View.OnLongClickListener() {
-                                          @Override
-                                         public boolean onLongClick(View v){
-                                              Intent myIntent = new Intent(MainToDo.this,EditTaskActivity.class);
-                                              myIntent.putExtra("taskId", (String)v.getTag()); //Optional parameters
-                                              MainToDo.this.startActivity(myIntent);
-                                             return false;
+                int taskId = task.getInt(TaskEditor.BUNDLE_TASK_ID);
+                TableRow tr = new TableRow(getApplication());
+                CheckBox cb = new CheckBox(getApplication());
+                cb.setTag(taskId);
+                cb.setOnClickListener(new View.OnClickListener() {
+                                          public void onClick(View v) {
+                                              CheckBox thisView = (CheckBox) v;
+                                              taskEditor.updateChecked((int) v.getTag(),
+                                                      thisView.isChecked() ? 1 : 0);
                                           }
-            });
+                                      }
+                );
+                TextView tv1 = new TextView(getApplication());
+                tr.addView(cb);
+                tr.addView(tv1);
+                tv1.setText(task.getString(TaskEditor.BUNDLE_TASK_NAME));
 
-            c.moveToNext();
+                //text field for due date, will likely be displayed in a different way in final
 
+                if (task.getInt(TaskEditor.BUNDLE_CHECKED) == 1) {
+                    cb.setChecked(true);
+                } else cb.setChecked(false);
 
+                //switch to color the row based on priority
+                //TODO cahnge colors
+                int priority = task.getInt(TaskEditor.BUNDLE_PRIORITY);
+                switch (priority) {
+                    case 1:
+                        tr.setBackgroundColor(Color.BLACK);
+                        break;
+                    case 2:
+                        tr.setBackgroundColor(Color.DKGRAY);
+                        break;
+                    case 3:
+                        tr.setBackgroundColor(Color.GREEN);
+                        break;
+                    case 4:
+                        tr.setBackgroundColor(Color.YELLOW);
+                        break;
+                    case 5:
+                        tr.setBackgroundColor(Color.RED);
+                        break;
+                    default:
+                        break;
+                }
+
+                tl.addView(tr);
+
+                tr.setTag(taskId);
+
+                tr.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        Intent myIntent = new Intent(MainToDo.this, EditTaskActivity.class);
+                        myIntent.putExtra("taskId", String.valueOf(v.getTag()));
+                        MainToDo.this.startActivity(myIntent);
+                        return false;
+                    }
+                });
+            }
         }
     }
 
@@ -302,109 +287,88 @@ implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDi
     //create task and save it when one is created
     @Override
     public void onSimpleDialogPositiveClick(String taskName, String dueDate) {
-        ContentValues values = new ContentValues();
-        values.put(TaskDB.COLUMN_NAME_TASK_NAME,taskName);
-        values.put(TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
-        values.put(TaskDB.COLUMN_NAME_CHECKED, 0);
 
-        //hook if row id is needed later
-        //might be good to have function
-        // that only updates the newly created task
-        long newRowId;
-        newRowId = dbW.insert(
-                TaskDB.TASK_TABLE_NAME,
-                null,
-                values);
-
-
+        taskEditor.createTask(taskName, dateConverter.stringToSql(dueDate), 1, 0, -1);
         tasksUpdated();
     }
 
 
     @Override
-    public void onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins, ArrayList<String> categories){
-        //set up all value for advance task
-        ContentValues values = new ContentValues();
-        values.put(TaskDB.COLUMN_NAME_TASK_NAME,taskName);
-        values.put(TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
-        values.put(TaskDB.COLUMN_NAME_CHECKED, 0);
-        values.put(TaskDB.COLUMN_NAME_PRIORITY, priority);
-        values.put(TaskDB.COLUMN_NAME_ESTIMATED_MINS, estimatedMins);
+    public long onAdvancedDialogPositiveClick(String taskName, String dueDate, int priority, int estimatedMins, ArrayList<String> categories, Bundle repeatingBundle){
+        //task id to return, returns the first task if it is recurring
+        long taskId = -1;
 
-        //hook if row id is needed later
-        //might be good to have function
-        //that only updates the newly created task
-        long newTaskRowId;
-        newTaskRowId = dbW.insert(
-                TaskDB.TASK_TABLE_NAME,
-                null,
-                values);
+        ArrayList<String> dates = new ArrayList<>();
 
+        //cheeck if there should be a repeating basis, if no the basis id will be -1
+        float basisId = -1;
+        if(repeatingBundle.containsKey(createRepeatingDialog.BUNDLE_ORDINAL_NUM)){
+            basisId = repeatingBasisEditor.createBasis(
+                    repeatingBundle.getInt(createRepeatingDialog.BUNDLE_PERIODICAL_NUM),
+                    repeatingBundle.getInt(createRepeatingDialog.BUNDLE_PERIODICAL_PERIOD),
+                    repeatingBundle.getInt(createRepeatingDialog.BUNDLE_ORDINAL_NUM),
+                    repeatingBundle.getInt(createRepeatingDialog.BUNDLE_ORDINAL_PERIOD),
+                    repeatingBundle.getIntArray(createRepeatingDialog.BUNDLE_DAY_OF_WEEK),
+                    repeatingBundle.getString(createRepeatingDialog.BUNDLE_START_DATE),
+                    repeatingBundle.getString(createRepeatingDialog.BUNDLE_END_DATE));
+            dates = repeatingBasisEditor.getBasisDates(basisId);
+        } else dates.add(dueDate);
+        //for each date add a task
+        for(int i = 0; i < dates.size();i++){
+            int id = taskEditor.createTask(taskName, dates.get(i),
+                    priority, estimatedMins, (int) basisId);
 
+            //save the first id to return
+            if(i == 0) taskId = id;
 
-        //check if a category exists
-        //if not create it
-        //then add it to the task_category table with keys from both
-        String[] projection = {
-                TaskDB._ID,
-                TaskDB.COLUMN_NAME_CATEGORY_NAME
-        };
+            taskEditor.updateCategories(categories, new ArrayList<String>(), id);
+        }
+        tasksUpdated();
+        return taskId;
+    }
 
-        //if the category exists, just add its id and the tasks id to the task_category table
-        //otherwise create the category and then add their ids
-        for(int i = 0; i < categories.size();i++){
-            Cursor c = dbR.query(
-                    TaskDB.CATEGORY_TABLE_NAME,  // The table to query
-                    projection,                               // The columns to return
-                    TaskDB.COLUMN_NAME_CATEGORY_NAME + "=?",                                // The columns for the WHERE clause
-                    new String[] {categories.get(i)},                            // The values for the WHERE clause
-                    null,                                     // don't group the rows
-                    null,                                     // don't filter by row groups
-                    null                                 // The sort order
-            );
-            if(c.getCount() > 0){
-                c.moveToFirst();
-                int categoryRowId = c.getInt(c.getColumnIndexOrThrow(TaskDB._ID));
-                values = new ContentValues();
-                values.put(TaskDB.COLUMN_NAME_TASK_ID, newTaskRowId);
-                values.put(TaskDB.COLUMN_NAME_CATEGORY_ID, categoryRowId);
-                long newTaskCategoryRowId = dbW.insert(
-                        TaskDB.TASK_CATEGORY_TABLE_NAME,
-                        null,
-                        values
-                );
+    @Override
+    public void onAdvancedDialogNeutralClick(String taskName, String dueDate, int priority,
+                                             int estimatedMins, ArrayList<String> categories, Bundle repeatingBundle) {
+        //same as positive but then open the edit with the first task id that was created
+        long taskId;
+        taskId = onAdvancedDialogPositiveClick(taskName, dueDate, priority, estimatedMins,
+                categories, repeatingBundle);
+        Intent myIntent = new Intent(MainToDo.this,EditTaskActivity.class);
+        myIntent.putExtra("taskId", String.valueOf(taskId));
+        MainToDo.this.startActivity(myIntent);
+    }
 
-            }else{
-                values = new ContentValues();
-                values.put(TaskDB.COLUMN_NAME_CATEGORY_NAME, categories.get(i));
-                long newCategoryRowId = dbW.insert(
-                        TaskDB.CATEGORY_TABLE_NAME,
-                        null,
-                        values
-                );
-                values = new ContentValues();
-                values.put(TaskDB.COLUMN_NAME_TASK_ID, newTaskRowId);
-                values.put(TaskDB.COLUMN_NAME_CATEGORY_ID, newCategoryRowId);
-                long newTaskCategoryRowId = dbW.insert(
-                        TaskDB.TASK_CATEGORY_TABLE_NAME,
-                        null,
-                        values
-                );
-            }
+    @Override
+    public void onRepeatingDialogPositiveClick(Bundle repeatingBundle) {
+        ArrayList<String> dates = new ArrayList<>();
+
+        //create the basis and get its id
+        float basisId = -1;
+        basisId = repeatingBasisEditor.createBasis(
+                repeatingBundle.getInt(createRepeatingDialog.BUNDLE_PERIODICAL_NUM),
+                repeatingBundle.getInt(createRepeatingDialog.BUNDLE_PERIODICAL_PERIOD),
+                repeatingBundle.getInt(createRepeatingDialog.BUNDLE_ORDINAL_NUM),
+                repeatingBundle.getInt(createRepeatingDialog.BUNDLE_ORDINAL_PERIOD),
+                repeatingBundle.getIntArray(createRepeatingDialog.BUNDLE_DAY_OF_WEEK),
+                repeatingBundle.getString(createRepeatingDialog.BUNDLE_START_DATE),
+                repeatingBundle.getString(createRepeatingDialog.BUNDLE_END_DATE));
+        dates = repeatingBasisEditor.getBasisDates(basisId);
+
+        //since this came from a simple dialog it will have a task name, save that
+        String taskName = repeatingBundle.getString(simpleCreateTaskDialog.BUNDLE_TASK_NAME);
+
+        //for each date create a task
+        for(String date: dates) {
+            taskEditor.createTask(taskName, date, 1, 0, (int)basisId);
         }
         tasksUpdated();
     }
 
-
-
-
-
-
-
-
-
-
-
+    @Override
+    public void onRepeatingDialogNegativeClick() {
+        //user canceled repeating dialog, do nothing
+    }
 
 
 }

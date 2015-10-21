@@ -1,16 +1,9 @@
 package com.example.nick.whattodolist.test;
 
-import android.app.LauncherActivity;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
-import android.support.test.runner.AndroidJUnit4;
-import android.test.ActivityInstrumentationTestCase2;
 
 import android.content.Context;
-
-import android.test.ActivityUnitTestCase;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -18,28 +11,24 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.example.nick.whattodolist.MainToDo;
-import com.example.nick.whattodolist.R;
 import com.example.nick.whattodolist.TaskDBContract;
 import com.example.nick.whattodolist.TaskDbHelper;
-import com.example.nick.whattodolist.repeatingBasisCreator;
+import com.example.nick.whattodolist.RepeatingBasisEditor;
 
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import android.test.AndroidTestCase;
-import android.test.InstrumentationTestCase;
-import 	android.test.ProviderTestCase2;
-import android.test.mock.MockContext;
-
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 
 /**
  * Created by Nick on 10/3/2015.
  */
-@RunWith(AndroidJUnit4.class)
-public class MainToDoTest extends AndroidTestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class MainToDoTest{
 
     MainToDo mActivity;
     TaskDBContract dbContract;
@@ -47,9 +36,11 @@ public class MainToDoTest extends AndroidTestCase {
     SQLiteDatabase dbR;
     SQLiteDatabase dbW;
 
+    @Mock
+    Context mMockContext;
 
 
-    public MainToDoTest() {
+    /*public MainToDoTest() {
         super();
     }
 
@@ -63,7 +54,7 @@ public class MainToDoTest extends AndroidTestCase {
 
         //set up reader and writer
         dbR = mDbHelper.getReadableDatabase();
-    }
+    } */
     //@Rule
     //public ActivityTestRule<MainToDo> mActivityRule =
     //        new ActivityTestRule<>(MainToDo.class);
@@ -94,11 +85,23 @@ public class MainToDoTest extends AndroidTestCase {
 */
     @Test
     public void repeatingRowCreated(){
+        dbContract = new TaskDBContract();
+        mDbHelper = new TaskDbHelper(mMockContext.getApplicationContext());
 
-        Bundle testBundle = new Bundle();
-        testBundle.putInt(repeatingBasisCreator.BUNDLE_PERIODICAL_PERIOD, 1);
-        testBundle.putIntArray(repeatingBasisCreator.BUNDLE_DAY_OF_WEEK, new int[]{0, 0, 0, 0, 0, 0, 0});
-        long newRowId = repeatingBasisCreator.createBasis(dbW, testBundle);
+        //set up reader and writer
+        dbR = mDbHelper.getReadableDatabase();
+        dbW = mDbHelper.getWritableDatabase();
+        int[] dayOfWeek = new int[7];
+        dayOfWeek[0] = 0;
+        dayOfWeek[1] = 0;
+        dayOfWeek[2] = 0;
+        dayOfWeek[3] = 0;
+        dayOfWeek[4] = 0;
+        dayOfWeek[5] = 0;
+        dayOfWeek[6] = 0;
+
+
+        long newRowId = RepeatingBasisEditor.createBasis(dbW, 1, 1, 1, 1, dayOfWeek, "2015-01-01", "2015-01-01");
 
         String[] projection = {
                 TaskDBContract.TaskDB._ID,

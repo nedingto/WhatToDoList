@@ -67,14 +67,14 @@ public abstract class spinnerPopulater extends Fragment
        });
 
                //add fields to the spinner list and set it's listener
-               populateSpinnerList(view);
+       populateSpinnerList(view);
        Spinner spinner = (Spinner)view.findViewById(R.id.spinner);
        spinner.setOnItemSelectedListener(this);
        return view;
    }
 
     //this will specify whether or not the add field is editable,
-    //i.e. if entries can be selected that are not already existant
+    //i.e. if entries can be selected that are not already existent
     public void setFreeForm(boolean freeForm, View v) {
         this.freeForm = freeForm;
         getView().findViewById(R.id.editText5).setEnabled(freeForm);
@@ -144,7 +144,7 @@ public abstract class spinnerPopulater extends Fragment
     }
 
     //when an item is selected from the sspinner it populates the field next to it
-    //should always asssert that delete column is the same size as selected
+    //should always assert that delete column is the same size as selected
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         Cursor c = (Cursor) parent.getItemAtPosition(position);
@@ -160,13 +160,15 @@ public abstract class spinnerPopulater extends Fragment
 
     //returns all of the selected entries
     public ArrayList<String> getDeleted(){
-        ArrayList<String> deleted = selectedOld;
+        ArrayList<String> deleted = new ArrayList<>();
+        deleted.addAll(selectedOld);
         deleted.removeAll(selectedNew);
         return deleted;
     }
 
     public ArrayList<String> getAdded(){
-        ArrayList<String> added = selectedNew;
+        ArrayList<String> added = new ArrayList();
+        added.addAll(selectedNew);
         added.removeAll(selectedOld);
         return added;
     }

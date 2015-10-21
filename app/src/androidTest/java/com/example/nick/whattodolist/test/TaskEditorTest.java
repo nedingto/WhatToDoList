@@ -13,6 +13,7 @@ import com.example.nick.whattodolist.MainToDo;
 import com.example.nick.whattodolist.TaskDBContract;
 import com.example.nick.whattodolist.TaskDbHelper;
 import com.example.nick.whattodolist.RepeatingBasisEditor;
+import com.example.nick.whattodolist.TaskEditor;
 
 
 import static org.junit.Assert.assertEquals;
@@ -25,14 +26,10 @@ import java.lang.Override;
 /**
  * Created by Nick on 10/3/2015.
  */
-//need to test
+//need to test with main activity to get context
 public class TaskEditorTest extends ActivityInstrumentationTestCase2<MainToDo>{
         MainToDo activity;
-        Context mContext = null;
-        TaskDBContract dbContract;
-        TaskDbHelper mDbHelper;
-        SQLiteDatabase dbR;
-        SQLiteDatabase dbW;
+        Context mContext;
 
     public TaskEditorTest(){
         super(MainToDo.class);
@@ -50,32 +47,8 @@ public void setUp() throws Exception {
 
     @Test
     public void testRepeatingRowCreated(){
-        R
-        int[] dayOfWeek = new int[7];
-        dayOfWeek[0] = 0;
-        dayOfWeek[1] = 0;
-        dayOfWeek[2] = 0;
-        dayOfWeek[3] = 0;
-        dayOfWeek[4] = 0;
-        dayOfWeek[5] = 0;
-        dayOfWeek[6] = 0;
+        TaskEditor taskEditor = new TaskEditor(mContext);
 
 
-        long newRowId = repeatingBasisEditor.createBasis(1, 1, 1, 1, dayOfWeek, "2015-01-01", "2015-01-01");
-
-        String[] projection = {
-                TaskDBContract.TaskDB._ID,
-        };
-
-        Cursor cursor = dbR.query(
-                TaskDBContract.TaskDB.REPEATING_TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                TaskDBContract.TaskDB.REPEATING_TABLE_NAME + "." + TaskDBContract.TaskDB._ID + "=?",         // The columns for the WHERE clause
-                new String[] {String.valueOf(newRowId)},                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
-        assertTrue(cursor.getCount() > 0);
     }
 }

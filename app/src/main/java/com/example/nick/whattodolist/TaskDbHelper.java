@@ -18,7 +18,8 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                     TaskDBContract.TaskDB.COLUMN_NAME_DUE_DATE + TEXT_TYPE + COMMA_SEP +
                     TaskDBContract.TaskDB.COLUMN_NAME_CHECKED + INTEGER_TYPE + COMMA_SEP +
                     TaskDBContract.TaskDB.COLUMN_NAME_PRIORITY + INTEGER_TYPE + COMMA_SEP +
-                    TaskDBContract.TaskDB.COLUMN_NAME_ESTIMATED_MINS + INTEGER_TYPE +
+                    TaskDBContract.TaskDB.COLUMN_NAME_ESTIMATED_MINS + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_REPEATING_BASIS + INTEGER_TYPE +
                     ")";
     private static final String SQL_CREATE_CATEGORY_TABLE =
             "CREATE TABLE " + TaskDBContract.TaskDB.CATEGORY_TABLE_NAME + " (" +
@@ -30,6 +31,23 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                     TaskDBContract.TaskDB.COLUMN_NAME_TASK_ID + INTEGER_TYPE + COMMA_SEP +
                     TaskDBContract.TaskDB.COLUMN_NAME_CATEGORY_ID + INTEGER_TYPE + ")";
 
+    private static final String SQL_CREATE_REPEATING_TABLE =
+            "CREATE TABLE " + TaskDBContract.TaskDB.REPEATING_TABLE_NAME + " (" +
+                    TaskDBContract.TaskDB._ID + " INTEGER PRIMARY KEY," +
+                    TaskDBContract.TaskDB.COLUMN_NAME_PERIODICAL_NUM + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_PERIODICAL_PERIOD + TEXT_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_ORDINAL_NUM + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_ORDINAL_PERIOD + TEXT_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_SUNDAY + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_MONDAY + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_TUESDAY + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_WEDNESDAY + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_THURSDAY + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_FRIDAY + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_SATURDAY + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_START_DATE + TEXT_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_END_DATE + TEXT_TYPE + ")";
+
     private static final String SQL_DELETE_TASK_TABLE =
             "DROP TABLE IF EXISTS " + TaskDBContract.TaskDB.TASK_TABLE_NAME;
 
@@ -39,8 +57,11 @@ public class TaskDbHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_TASK_CATEGORY_TABLE =
             "DROP TABLE IF EXISTS " + TaskDBContract.TaskDB.TASK_CATEGORY_TABLE_NAME;
 
+    private static final String SQL_DELETE_REPEATING_TABLE =
+            "DROP TABLE IF EXISTS " + TaskDBContract.TaskDB.REPEATING_TABLE_NAME;
+
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 13;
+    public static final int DATABASE_VERSION = 27;
     public static final String DATABASE_NAME = "Task.db";
 
     public TaskDbHelper(Context context) {
@@ -50,6 +71,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_TASK_TABLE);
         db.execSQL(SQL_CREATE_CATEGORY_TABLE);
         db.execSQL(SQL_CREATE_TASK_CATEGORY_TABLE);
+        db.execSQL(SQL_CREATE_REPEATING_TABLE);
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
@@ -57,6 +79,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DELETE_TASK_TABLE);
         db.execSQL(SQL_DELETE_CATEGORY_TABLE);
         db.execSQL(SQL_DELETE_TASK_CATEGORY_TABLE);
+        db.execSQL(SQL_DELETE_REPEATING_TABLE);
         onCreate(db);
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {

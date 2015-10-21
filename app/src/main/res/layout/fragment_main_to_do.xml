@@ -12,34 +12,12 @@
         android:layout_height="match_parent"
         android:background="#000000">
 
-        <TableLayout
-            android:layout_width="fill_parent"
-            android:layout_height="50dp">
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:background="#010101" >
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:text="&lt;--Todays tasks-->"
-                    android:id="@+id/textView16"
-                    android:textColor="@android:color/white"
-                    android:password="false"
-                    android:textSize="25dp"
-                    android:layout_gravity="center" />
-
-            </TableRow>
-        </TableLayout>
-
         <ScrollView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:id="@+id/scrollView"
             android:layout_weight="1"
-            >
+            android:fillViewport="false">
 
             <TableLayout
                 android:layout_width="fill_parent"
@@ -47,7 +25,16 @@
                 android:layout_weight="1"
                 android:id="@+id/tableLayout1">
 
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="New Text"
+                        android:id="@+id/textView25" />
 
+                </TableRow>
             </TableLayout>
         </ScrollView>
         <TableLayout
