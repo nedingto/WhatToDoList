@@ -16,14 +16,14 @@ public class dateConverter {
         if(cal.get(Calendar.MONTH)<9) m = "0" + m;
         String d = String.valueOf(cal.get(Calendar.DAY_OF_MONTH));
         if(cal.get(Calendar.DAY_OF_MONTH)<10) d = "0" + d;
-        dateString = d + "/" + m + "/" + y;
+        dateString = m + "/" + d + "/" + y;
         return dateString;
     }
     public static Calendar stringToCalendar(String dateString){
         Calendar cal = Calendar.getInstance();
         String[] pieces = dateString.split("/");
-        cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(pieces[0]));
-        cal.set(Calendar.MONTH, Integer.parseInt(pieces[1]) - 1);
+        cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(pieces[1]));
+        cal.set(Calendar.MONTH, Integer.parseInt(pieces[0]) - 1);
         cal.set(Calendar.YEAR, Integer.parseInt(pieces[2]));
 
         return cal;
@@ -49,13 +49,13 @@ public class dateConverter {
     public static String stringToSql(String dateString){
         String sqlDate = "";
         String[] pieces = dateString.split("/");
-        sqlDate  = pieces[2] + "-" + pieces[1] + "-" + pieces[0];
+        sqlDate  = pieces[2] + "-" + pieces[0] + "-" + pieces[1];
         return sqlDate;
     }
     public static String sqlToString(String sqlDate){
         String dateString = "";
         String[] pieces = sqlDate.split("-");
-        dateString = pieces[2] + "/" + pieces[1] + "/" + pieces[0];
+        dateString = pieces[1] + "/" + pieces[0] + "/" + pieces[2];
         return dateString;
     }
 
