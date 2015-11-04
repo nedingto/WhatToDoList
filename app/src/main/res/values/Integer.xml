@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="periodical_period_day">
+        0
+    </integer>
+    <integer name="periodical_period_week">
+        1
+    </integer>
+    <integer name="periodical_period_month">
+        2
+    </integer>
+    <integer name="periodical_period_year">
+        3
+    </integer>
+    <integer name="ordinal_period_day_or_month">
+        0
+    </integer>
+    <integer name="ordinal_period_sunday">
+        1
+    </integer>
+    <integer name="ordinal_period_monday">
+        2
+    </integer>
+    <integer name="ordinal_period_tuesday">
+        3
+    </integer>
+    <integer name="ordinal_period_wednesday">
+        4
+    </integer>
+    <integer name="ordinal_period_thursday">
+        5
+    </integer>
+    <integer name="ordinal_period_friday">
+        6
+    </integer>
+    <integer name="ordinal_period_saturday">
+        7
+    </integer>
+</resources>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <!-- suggestion to make default task be the title of the field-->
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText6"
+            android:layout_gravity="center_horizontal"
+            android:inputType="textNoSuggestions"
+            android:text="Task Name" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Due Date"
+            android:id="@+id/textView6"
+            android:textSize="25dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical" />
+
+        <!-- sugestion to make a check box and when checked open dialog
+        and then fill in bases when checked, disable bases when unchecked-->
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Repeating"
+            android:id="@+id/button"
+            android:layout_gravity="right"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <!-- decided to go with date picker as apposed to spinners
+    as it is an android standard and it allows users to see
+    visually when the due date is and the day of the week -->
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <DatePicker
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/datePicker"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:spinnersShown="false"
+            android:datePickerMode="spinner">
+
+        </DatePicker>
+    </LinearLayout>
+
+</LinearLayout>
