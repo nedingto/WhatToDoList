@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 
 
+
 import java.util.ArrayList;
 
 /**
@@ -48,6 +49,7 @@ public class advancedCreateTaskDialog extends DialogFragment{
 
                     }
                 })
+
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // User cancelled the dialog so do nothing
@@ -63,6 +65,7 @@ public class advancedCreateTaskDialog extends DialogFragment{
                 }
             });
         }
+
 
         // Create the AlertDialog object and return it
         return  builder.create();

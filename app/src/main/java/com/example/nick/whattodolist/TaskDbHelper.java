@@ -49,6 +49,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                     TaskDBContract.TaskDB.COLUMN_NAME_START_DATE + TEXT_TYPE + COMMA_SEP +
                     TaskDBContract.TaskDB.COLUMN_NAME_END_DATE + TEXT_TYPE + ")";
 
+
        private static final String SQL_CREATE_TASK_RELATION_TABLE =
                "CREATE TABLE " + TaskDBContract.TaskDB.TASK_RELATION_TABLE_NAME + " (" +
                        TaskDBContract.TaskDB._ID + " INTEGER PRIMARY KEY," +
@@ -74,6 +75,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 35;
+
     public static final String DATABASE_NAME = "Task.db";
 
     public TaskDbHelper(Context context) {
@@ -94,6 +96,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DELETE_TASK_CATEGORY_TABLE);
         db.execSQL(SQL_DELETE_REPEATING_TABLE);
         db.execSQL(SQL_DELETE_TASK_RELATION_TABLE);
+
         onCreate(db);
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {

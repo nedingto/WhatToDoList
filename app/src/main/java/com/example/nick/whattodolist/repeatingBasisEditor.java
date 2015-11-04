@@ -13,7 +13,9 @@ import java.util.Calendar;
 /**
  * Created by Nick on 10/13/2015.
  */
+
 public class repeatingBasisEditor {
+
     TaskDBContract dbContract;
     TaskDbHelper mDbHelper;
     SQLiteDatabase dbR;
@@ -21,7 +23,9 @@ public class repeatingBasisEditor {
 
     Context c;
 
+
     public repeatingBasisEditor(Context context) {
+
         c = context;
         dbContract = new TaskDBContract();
         mDbHelper = new TaskDbHelper(context);

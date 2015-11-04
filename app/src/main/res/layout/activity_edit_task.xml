@@ -102,7 +102,6 @@
                     android:id="@+id/button5"
                     android:onClick="repeatingClicked"/>
             </LinearLayout>
-
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -115,6 +114,7 @@
                     android:id="@+id/textView28"
                     android:textSize="25dp" />
             </LinearLayout>
+
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -215,6 +215,7 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
+
                 android:layout_height="wrap_content">
 
                 <Button

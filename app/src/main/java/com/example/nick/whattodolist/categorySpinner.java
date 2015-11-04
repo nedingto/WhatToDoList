@@ -3,7 +3,9 @@ package com.example.nick.whattodolist;
 /**
  * Created by Nick on 10/6/2015.
  */
+
 public class categorySpinner extends customSpinnerFragment {
+
     //creates an instance of the custom spinner fragment for categories
     @Override
     public String giveTableName() {

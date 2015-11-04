@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import android.app.DialogFragment;
 import android.content.Intent;
+
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.Fragment;
@@ -20,9 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
 
 public class MainToDo extends AppCompatActivity
 implements simpleCreateTaskDialog.SimpleCreateTaskListener, advancedCreateTaskDialog.AdvancedCreateTaskListener,
@@ -46,10 +49,12 @@ createRepeatingDialog.RepeatingCreateTaskListener{
     TaskEditor taskEditor;
     com.example.nick.whattodolist.repeatingBasisEditor repeatingBasisEditor;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         taskEditor = new TaskEditor(getApplicationContext());
         repeatingBasisEditor = new repeatingBasisEditor(getApplicationContext());
+
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_main_to_do);
@@ -179,6 +184,7 @@ createRepeatingDialog.RepeatingCreateTaskListener{
 
         //removes the task list and then programmatically fills it will the newest tasks
         LinearLayout tl = (LinearLayout)findViewById(R.id.task_layout);
+
         tl.removeAllViews();
 
         //set a calendar to test these against, if there are past
@@ -278,6 +284,7 @@ createRepeatingDialog.RepeatingCreateTaskListener{
     //create task and save it when one is created
     @Override
     public void onSimpleDialogPositiveClick(String taskName, String dueDate) {
+
 
         taskEditor.createTask(taskName, dueDate, 1, 0, -1);
         tasksUpdated();

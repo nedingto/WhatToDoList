@@ -323,6 +323,7 @@ public class TaskEditor {
             int incompleteSub = c.getInt(c.getColumnIndex(TaskDBContract.TaskDB.COLUMN_NAME_INCOMPLETE_SUB));
             simpleBundle.putInt(BUNDLE_INCOMPLETE_SUB, incompleteSub);
 
+
             tasks.add(simpleBundle);
 
             c.moveToNext();
