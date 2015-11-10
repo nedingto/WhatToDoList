@@ -12,7 +12,7 @@ import org.junit.Test;
 import com.example.nick.whattodolist.MainToDo;
 import com.example.nick.whattodolist.TaskDBContract;
 import com.example.nick.whattodolist.TaskDbHelper;
-import com.example.nick.whattodolist.RepeatingBasisEditor;
+import com.example.nick.whattodolist.repeatingBasisEditor;
 import com.example.nick.whattodolist.TaskEditor;
 
 

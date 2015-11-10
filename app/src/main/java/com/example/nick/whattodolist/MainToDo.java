@@ -19,7 +19,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import android.widget.TableLayout;
@@ -367,6 +369,11 @@ createRepeatingDialog.RepeatingCreateTaskListener{
     public void onRepeatingDialogNegativeClick() {
         //user canceled repeating dialog, do nothing
     }
+
+        public void onCreateRepeatingCLicked(View v) {
+            DialogFragment newFragment = new createRepeatingDialog();
+            newFragment.show(getFragmentManager(), "create repeating");
+        }
 
 
 }

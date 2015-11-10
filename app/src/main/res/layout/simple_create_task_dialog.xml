@@ -16,7 +16,9 @@
             android:id="@+id/editText6"
             android:layout_gravity="center_horizontal"
             android:inputType="textNoSuggestions"
-            android:text="Task Name" />
+            android:hint="Task Name"
+            android:focusable="true"
+            />
     </LinearLayout>
 
     <LinearLayout
@@ -35,13 +37,6 @@
 
         <!-- sugestion to make a check box and when checked open dialog
         and then fill in bases when checked, disable bases when unchecked-->
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Repeating"
-            android:id="@+id/button"
-            android:layout_gravity="right"
-            android:layout_weight="1"/>
     </LinearLayout>
 
     <!-- decided to go with date picker as apposed to spinners

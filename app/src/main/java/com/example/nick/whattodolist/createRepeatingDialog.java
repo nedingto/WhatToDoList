@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -95,14 +96,15 @@ public class createRepeatingDialog extends DialogFragment {
             ((TextView)dialogView.findViewById(R.id.textView23)).setText(dateConverter.sqlToString(args.getString(BUNDLE_END_DATE)));
         } else {
 
-            //otherwise add the title from the last dialog and initialize the dates to today
-            String taskName = getArguments().getString(simpleCreateTaskDialog.BUNDLE_TASK_NAME);
+            //otherwise add a feild to task title and initialize the dates to today
             LinearLayout layout = (LinearLayout) dialogView.findViewById(R.id.taskNamePlaceholder);
             EditText editText = new EditText(getActivity());
             //make the edit text fill the view
-            editText.setLayoutParams(new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
-            editText.setText(taskName);
+            editText.setLayoutParams(new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            editText.setHint("Task Name");
+            editText.requestFocus();
             editText.setId(R.id.task_name_reepeating_dialog);
+            alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
             layout.addView(editText);
 
             //initialize the dates

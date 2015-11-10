@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -99,6 +100,7 @@ public class EditTaskActivity extends AppCompatActivity
         //set title
         EditText title = ((EditText) findViewById(R.id.editText));
         title.setText(taskBundle.getString(TaskEditor.BUNDLE_TASK_NAME));
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         //set due date, and format it
         TextView dueDate = ((TextView) findViewById(R.id.textView21));
@@ -282,7 +284,9 @@ public class EditTaskActivity extends AppCompatActivity
         dueDate = ((TextView) findViewById(R.id.textView21)).getText().toString();
         priority = (int)((RatingBar) findViewById(R.id.ratingBar2)).getRating();
         checked = ((CheckBox) findViewById(R.id.checkBox11)).isChecked()? 1 : 0;
-        estimation = Integer.parseInt(((EditText) findViewById(R.id.editText10)).getText().toString());
+        String estimationText = ((EditText) findViewById(R.id.editText10)).getText().toString();
+        if(estimationText.equals(""))estimation = 0;
+        else estimation = Integer.parseInt(estimationText);
         addedCategories = fragment.getAdded();
         deletedCategories = fragment.getDeleted();
     }
@@ -291,6 +295,8 @@ public class EditTaskActivity extends AppCompatActivity
     public void repeatingClicked(View v){
         //first, warn the user that their changes will be discarded
         DialogFragment saveFragment = new discardChangesDialog();
+        Bundle args = new Bundle();
+        saveFragment.setArguments(args);
         saveFragment.show(getFragmentManager(), "discard changes");
     }
 

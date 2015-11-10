@@ -30,7 +30,7 @@ public class Dag {
             nodes.put(subId, newSub);
             sub = nodes.get(subId);
         }
-        //only add te edge if it doesn't already exist
+        //only add the edge if it doesn't already exist
         if(!parent.getSubTaskIds().contains(sub)) {
             parent.addSubTask(sub);
             sub.addParentTask(parent);

@@ -11,7 +11,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="(Due date and completion canges can only be applied to this task)"
+            android:text="(Due date, relation, and completion changes can only be applied to this task)"
             android:id="@+id/textView27"
             android:textColor="#f92525"
             android:layout_gravity="center"

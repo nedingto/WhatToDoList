@@ -44,6 +44,7 @@ public class advancedCreateTaskDialog extends DialogFragment{
                     public void onClick(DialogInterface dialog, int id) {
                         //pull from the fields and pass the click event
                         gatherFields();
+                        clearFragment();
                         mListener.onAdvancedDialogPositiveClick(taskName, dueDate, priority,
                                 estimation, addedCategories, basisBundle);
 
@@ -52,6 +53,7 @@ public class advancedCreateTaskDialog extends DialogFragment{
 
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        clearFragment();
                         // User cancelled the dialog so do nothing
                     }
                 });
@@ -60,6 +62,7 @@ public class advancedCreateTaskDialog extends DialogFragment{
                 public void onClick(DialogInterface dialog, int id) {
                     //pull from the fields and pass the click event
                     gatherFields();
+                    clearFragment();
                     mListener.onAdvancedDialogNeutralClick(taskName, dueDate, priority,
                             estimation, addedCategories, basisBundle);
                 }
@@ -116,8 +119,10 @@ public class advancedCreateTaskDialog extends DialogFragment{
 
         priority = (int) (((RatingBar) getDialog().findViewById(R.id.ratingBar)).getRating());
 
-        EditText editText = ((EditText) getDialog().findViewById(R.id.editText2));
-        estimation = Integer.parseInt(editText.getText().toString());
+        String editText = ((EditText) getDialog().findViewById(R.id.editText2)).getText().toString();
+        if(editText.equals("")){
+            estimation = 0;
+        }else estimation = Integer.parseInt(editText);
 
         //addedCategories categories come from the spinner fragment
         customSpinnerFragment fragment = (customSpinnerFragment) getFragmentManager().findFragmentById(
@@ -127,8 +132,7 @@ public class advancedCreateTaskDialog extends DialogFragment{
     }
 
     //destroys the fragment when this closes
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void clearFragment() {
         FragmentManager fm = getActivity().getFragmentManager();
         Fragment fragment = (fm.findFragmentById(R.id.spinner_fragment_advanced));
         FragmentTransaction ft = fm.beginTransaction();

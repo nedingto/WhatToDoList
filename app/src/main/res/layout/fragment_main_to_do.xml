@@ -25,17 +25,31 @@
                 android:layout_height="match_parent"
                 android:id="@+id/task_layout"></LinearLayout>
         </ScrollView>
+
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:text="Create Task"
-                android:id="@+id/createTaskButton"
-                android:onClick="createTask"
-               />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create Task"
+                    android:id="@+id/createTaskButton"
+                    android:onClick="createTask"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create Recurring Task"
+                    android:id="@+id/button12"
+                    android:onClick="onCreateRepeatingCLicked"
+                    android:layout_weight="1" />
+            </TableRow>
         </TableLayout>
 
     </LinearLayout>

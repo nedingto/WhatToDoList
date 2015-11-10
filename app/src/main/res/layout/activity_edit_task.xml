@@ -15,7 +15,8 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:id="@+id/edit_layout">
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -210,7 +211,7 @@
                 android:inputType="number"
                 android:ems="10"
                 android:id="@+id/editText10"
-                android:text="0" />
+                android:hint="0" />
             </LinearLayout>
             <LinearLayout
                 android:orientation="horizontal"

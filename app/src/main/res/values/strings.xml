@@ -10,7 +10,7 @@
     <string name="simple_create_task_dilog">Create Task</string>
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
-    <string name="next">Next</string>
+    <string name="next">Advanced</string>
     <string name="advanced_create_task_dialog">Advanced Task Settings</string>
     <string name="edit">Create and Edit</string>
     <string name="title_key">Title</string>
@@ -46,49 +46,49 @@
         <item>Year(s)</item>
     </string-array>
     <string-array name="limited_periodicial_numbers">
-        <item>1</item>
+        <item>Every 1</item>
     </string-array>
     <string-array name="periodicial_numbers">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>21</item>
-        <item>22</item>
-        <item>23</item>
-        <item>24</item>
-        <item>25</item>
-        <item>26</item>
-        <item>27</item>
-        <item>28</item>
-        <item>29</item>
-        <item>30</item>
-        <item>31</item>
-        <item>32</item>
-        <item>33</item>
-        <item>34</item>
-        <item>35</item>
-        <item>36</item>
-        <item>37</item>
-        <item>38</item>
-        <item>39</item>
-        <item>40</item>
-        <item>41</item>
-        <item>42</item>
-        <item>43</item>
-        <item>44</item>
-        <item>45</item>
-        <item>46</item>
-        <item>47</item>
-        <item>48</item>
-        <item>49</item>
-        <item>50</item>
+        <item>Every 1</item>
+        <item>Every 2</item>
+        <item>Every 3</item>
+        <item>Every 4</item>
+        <item>Every 5</item>
+        <item>Every 6</item>
+        <item>Every 7</item>
+        <item>Every 8</item>
+        <item>Every 9</item>
+        <item>Every 10</item>
+        <item>Every 21</item>
+        <item>Every 22</item>
+        <item>Every 23</item>
+        <item>Every 24</item>
+        <item>Every 25</item>
+        <item>Every 26</item>
+        <item>Every 27</item>
+        <item>Every 28</item>
+        <item>Every 29</item>
+        <item>Every 30</item>
+        <item>Every 31</item>
+        <item>Every 32</item>
+        <item>Every 33</item>
+        <item>Every 34</item>
+        <item>Every 35</item>
+        <item>Every 36</item>
+        <item>Every 37</item>
+        <item>Every 38</item>
+        <item>Every 39</item>
+        <item>Every 40</item>
+        <item>Every 41</item>
+        <item>Every 42</item>
+        <item>Every 43</item>
+        <item>Every 44</item>
+        <item>Every 45</item>
+        <item>Every 46</item>
+        <item>Every 47</item>
+        <item>Every 48</item>
+        <item>Every 49</item>
+        <item>Every 50</item>
     </string-array>
     <string-array name="of_the_month">
         <item>Day</item>
@@ -104,59 +104,59 @@
         <item>Month</item>
     </string-array>
     <string-array name="week_of_month_ordinals">
-        <item>Last</item>
-        <item>1st</item>
-        <item>2nd</item>
-        <item>3rd</item>
-        <item>4th</item>
+        <item>On the Last</item>
+        <item>On the 1st</item>
+        <item>On the 2nd</item>
+        <item>On the 3rd</item>
+        <item>On the 4th</item>
     </string-array>
     <string-array name="month_of_year_ordinals">
-        <item>1st</item>
-        <item>2nd</item>
-        <item>3rd</item>
-        <item>4th</item>
-        <item>5th</item>
-        <item>6th</item>
-        <item>7th</item>
-        <item>8th</item>
-        <item>9th</item>
-        <item>10th</item>
-        <item>11th</item>
-        <item>12th</item>
+        <item>On the 1st</item>
+        <item>On the 2nd</item>
+        <item>On the 3rd</item>
+        <item>On the 4th</item>
+        <item>On the 5th</item>
+        <item>On the 6th</item>
+        <item>On the 7th</item>
+        <item>On the 8th</item>
+        <item>On the 9th</item>
+        <item>On the 10th</item>
+        <item>On the 11th</item>
+        <item>On the 12th</item>
     </string-array>
     <string-array name="day_of_month_ordinals">
-        <item>Last</item>
-        <item>1st</item>
-        <item>2nd</item>
-        <item>3rd</item>
-        <item>4th</item>
-        <item>5th</item>
-        <item>6th</item>
-        <item>7th</item>
-        <item>8th</item>
-        <item>9th</item>
-        <item>10th</item>
-        <item>11th</item>
-        <item>12th</item>
-        <item>13th</item>
-        <item>14th</item>
-        <item>15th</item>
-        <item>16th</item>
-        <item>17th</item>
-        <item>18th</item>
-        <item>19th</item>
-        <item>20th</item>
-        <item>21st</item>
-        <item>22nd</item>
-        <item>23rd</item>
-        <item>24th</item>
-        <item>25th</item>
-        <item>26th</item>
-        <item>27th</item>
-        <item>28th</item>
-        <item>29th</item>
-        <item>30th</item>
-        <item>31st</item>
+        <item>On the Last</item>
+        <item>On the 1st</item>
+        <item>On the 2nd</item>
+        <item>On the 3rd</item>
+        <item>On the 4th</item>
+        <item>On the 5th</item>
+        <item>On the 6th</item>
+        <item>On the 7th</item>
+        <item>On the 8th</item>
+        <item>On the 9th</item>
+        <item>On the 10th</item>
+        <item>On the 11th</item>
+        <item>On the 12th</item>
+        <item>On the 13th</item>
+        <item>On the 14th</item>
+        <item>On the 15th</item>
+        <item>On the 16th</item>
+        <item>On the 17th</item>
+        <item>On the 18th</item>
+        <item>On the 19th</item>
+        <item>On the 20th</item>
+        <item>On the 21st</item>
+        <item>On the 22nd</item>
+        <item>On the 23rd</item>
+        <item>On the 24th</item>
+        <item>On the 25th</item>
+        <item>On the 26th</item>
+        <item>On the 27th</item>
+        <item>On the 28th</item>
+        <item>On the 29th</item>
+        <item>On the 30th</item>
+        <item>On the 31st</item>
     </string-array>
 
 

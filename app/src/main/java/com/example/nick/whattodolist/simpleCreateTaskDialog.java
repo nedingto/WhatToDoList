@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -75,21 +76,8 @@ public class simpleCreateTaskDialog extends DialogFragment {
         // Create the AlertDialog object and return it
         final AlertDialog alert =  builder.create();
 
-        //make button click for the repeating button
-        Button btn = (Button)dialogView.findViewById(R.id.button);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //bundle the task name and end it to a new dialog for repeating
-                Bundle args = new Bundle();
-                String taskName = ((EditText) v.getRootView().findViewById(R.id.editText6)).getText().toString();
-                args.putString(BUNDLE_TASK_NAME, taskName);
-                DialogFragment newFragment = new createRepeatingDialog();
-                newFragment.setArguments(args);
-                alert.dismiss();
-                newFragment.show(getFragmentManager(), "create repeating");
-            }
-        });
+        //set the keyboard to visable
+        alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
         return alert;
 

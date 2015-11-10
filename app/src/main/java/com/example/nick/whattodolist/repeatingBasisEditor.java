@@ -66,7 +66,6 @@ public class repeatingBasisEditor {
         //returns all of the dates the basis refers to
         ArrayList<String> basisDates = new ArrayList<>();
         Calendar calStart;
-        Calendar calTmp;
         Calendar calEnd;
 
         //get the basis
@@ -116,36 +115,35 @@ public class repeatingBasisEditor {
 
             //set the start and end dates and a temp calendar for later use
             calStart = dateConverter.sqlToCalendar(startDate);
-            calTmp = dateConverter.sqlToCalendar(startDate);
             calEnd = dateConverter.sqlToCalendar(endDate);
 
             if (periodicalPeriod == c.getResources().getInteger(R.integer.periodical_period_day)) {
                 //this would be day
-                basisDates = getDailyBasis(calStart, calEnd, calTmp, periodicalNum);
+                basisDates = getDailyBasis(calStart, calEnd, periodicalNum);
             } else if (periodicalPeriod == c.getResources().getInteger(R.integer.periodical_period_week)) {
                 //this would be week
-                basisDates = getWeeklyBasis(calStart, calEnd, calTmp, periodicalNum, sunday,
+                basisDates = getWeeklyBasis(calStart, calEnd, periodicalNum, sunday,
                         monday, tuesday, wednesday, thursday, friday, saturday);
             } else if (periodicalPeriod == c.getResources().getInteger(R.integer.periodical_period_month)) {
                 if (ordinalNum != 0) {
                     if (ordinalPeriod == c.getResources().getInteger(R.integer.ordinal_period_day_or_month)) {
-                        basisDates = getDayOfMonthBasis(calStart, calEnd, calTmp, ordinalNum);
+                        basisDates = getDayOfMonthBasis(calStart, calEnd, ordinalNum);
                     } else {
                         //the ordinal period is a day of the week that is wanted
-                        basisDates = getDayOfWeekInMonthBasis(calStart, calEnd, calTmp,
+                        basisDates = getDayOfWeekInMonthBasis(calStart, calEnd,
                                 ordinalPeriod, ordinalNum);
                     }
                 } else {
                     //this means last was selected
                     if (ordinalPeriod == c.getResources().getInteger(R.integer.ordinal_period_day_or_month)) {
-                        basisDates = getLastDayOfMonthBasis(calStart, calEnd, calTmp);
+                        basisDates = getLastDayOfMonthBasis(calStart, calEnd);
                     } else {
-                        basisDates = getLastWeekInMonthBasis(calStart, calEnd, calTmp, ordinalPeriod);
+                        basisDates = getLastWeekInMonthBasis(calStart, calEnd, ordinalPeriod);
                     }
                 }
             } else {
                 //the user has selected a year basis
-                basisDates = getMonthInYearBasis(calStart, calEnd, calTmp, ordinalNum);
+                basisDates = getMonthInYearBasis(calStart, calEnd, ordinalNum);
             }
         }
         return basisDates;
@@ -286,8 +284,9 @@ public class repeatingBasisEditor {
         return basis;
     }
 
-    private ArrayList<String> getDailyBasis(Calendar calStart, Calendar calEnd, Calendar calTmp,
+    private ArrayList<String> getDailyBasis(Calendar calStart, Calendar calEnd,
                                             int periodicalNum) {
+        Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
         while (!calTmp.after(calEnd)) {
             basisDates.add(dateConverter.calendarToSql(calTmp));
@@ -296,10 +295,11 @@ public class repeatingBasisEditor {
         return basisDates;
     }
 
-    private ArrayList<String> getWeeklyBasis(Calendar calStart, Calendar calEnd, Calendar calTmp,
+    private ArrayList<String> getWeeklyBasis(Calendar calStart, Calendar calEnd,
                                              int periodicalNum, int sunday, int monday,
                                              int tuesday, int wednesday, int thursday, int friday,
                                              int saturday) {
+        Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
         while (!calTmp.after(calEnd)) {
             //if the day is marked add the date
@@ -323,8 +323,6 @@ public class repeatingBasisEditor {
                 //so now it will move to the next specified week, decided by
                 //adding seven days for each integer the periodicalNum is past 1
                 calTmp.add(Calendar.DAY_OF_YEAR, (periodicalNum - 1) * 7);
-            } else {
-                //this should never happen
             }
             ///move on to the next day
             calTmp.add(Calendar.DAY_OF_YEAR, 1);
@@ -332,8 +330,8 @@ public class repeatingBasisEditor {
         return basisDates;
     }
 
-    private ArrayList<String> getDayOfMonthBasis(Calendar calStart, Calendar calEnd, Calendar calTmp,
-                                                 int ordinalNum) {
+    private ArrayList<String> getDayOfMonthBasis(Calendar calStart, Calendar calEnd, int ordinalNum) {
+        Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
         //if the start date comes before the day of the month specified and the
         //current month has the given day, then add it to the date list, otherwise skip it
@@ -364,20 +362,10 @@ public class repeatingBasisEditor {
     }
 
     private ArrayList<String> getDayOfWeekInMonthBasis(Calendar calStart, Calendar calEnd,
-                                                       Calendar calTmp, int ordinalPeriod,
+                                                       int ordinalPeriod,
                                                        int ordinalNum) {
+        Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
-        dateConverter.setDayOfWeekInMonth(calTmp, ordinalPeriod, ordinalNum);
-
-
-        while (!calTmp.after(calEnd)) {
-            if (!calTmp.before(calStart)) {
-                basisDates.add(dateConverter.calendarToSql(calTmp));
-            }
-            calTmp.add(Calendar.MONTH, 1);
-            dateConverter.setDayOfWeekInMonth(calTmp, ordinalPeriod, ordinalNum);
-
-        }
         dateConverter.setDayOfWeekInMonth(calTmp, ordinalPeriod, ordinalNum);
 
 
@@ -392,8 +380,8 @@ public class repeatingBasisEditor {
         return basisDates;
     }
 
-    private ArrayList<String> getLastDayOfMonthBasis(Calendar calStart, Calendar calEnd,
-                                                     Calendar calTmp){
+    private ArrayList<String> getLastDayOfMonthBasis(Calendar calStart, Calendar calEnd){
+        Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
         calTmp.set(Calendar.DAY_OF_MONTH, calTmp.getActualMaximum(Calendar.DAY_OF_MONTH));
         while (!calTmp.after(calEnd)) {
@@ -403,8 +391,8 @@ public class repeatingBasisEditor {
         }
         return basisDates;
     }
-    private ArrayList<String> getLastWeekInMonthBasis(Calendar calStart, Calendar calEnd,
-                                                     Calendar calTmp, int ordinalPeriod){
+    private ArrayList<String> getLastWeekInMonthBasis(Calendar calStart, Calendar calEnd, int ordinalPeriod){
+        Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
         //the array is set up so that the indexes of the array line up with the
         //indexes of the Calendar day of the week
@@ -431,8 +419,8 @@ public class repeatingBasisEditor {
         return basisDates;
     }
 
-    private ArrayList<String> getMonthInYearBasis(Calendar calStart, Calendar calEnd, Calendar calTmp,
-                                                  int ordinalNum){
+    private ArrayList<String> getMonthInYearBasis(Calendar calStart, Calendar calEnd, int ordinalNum){
+        Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
         calTmp.set(Calendar.MONTH, ordinalNum + 1);
         calTmp.set(Calendar.DAY_OF_MONTH, 1);
@@ -444,5 +432,7 @@ public class repeatingBasisEditor {
         }
         return basisDates;
     }
+
+
 
 }
