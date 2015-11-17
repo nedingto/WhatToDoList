@@ -422,7 +422,7 @@ public class repeatingBasisEditor {
     public ArrayList<String> getMonthInYearBasis(Calendar calStart, Calendar calEnd, int ordinalNum){
         Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
-        calTmp.set(Calendar.MONTH, ordinalNum + 1);
+        calTmp.set(Calendar.MONTH, ordinalNum);
         calTmp.set(Calendar.DAY_OF_MONTH, 1);
         while (!calTmp.after(calEnd)) {
             if (!calTmp.before(calStart)) {

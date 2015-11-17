@@ -163,19 +163,21 @@ public class TaskEditor {
         if (priorityInt != -1)values.put(TaskDBContract.TaskDB.COLUMN_NAME_PRIORITY, priorityInt);
         if (estimationInt != -1)values.put(TaskDBContract.TaskDB.COLUMN_NAME_ESTIMATED_MINS, estimationInt);
         if (checkedInt != -1)values.put(TaskDBContract.TaskDB.COLUMN_NAME_CHECKED, checkedInt);
+        if (values.size() != 0) {
+            String selection = TaskDBContract.TaskDB._ID + " LIKE ?";
+            String[] selectionArgs = {String.valueOf(taskId)};
 
-        String selection = TaskDBContract.TaskDB._ID+ " LIKE ?";
-        String[] selectionArgs = { String.valueOf(taskId) };
-
-        int cout = dbR.update(
-                TaskDBContract.TaskDB.TASK_TABLE_NAME,
-                values,
-                selection,
-                selectionArgs
-        );
+            int cout = dbR.update(
+                    TaskDBContract.TaskDB.TASK_TABLE_NAME,
+                    values,
+                    selection,
+                    selectionArgs
+            );
+        }
     }
 
     public void deleteTask (int taskId){
+        removeAllRelations(taskId);
         //will delete task based on the id given
         String table = TaskDBContract.TaskDB.TASK_TABLE_NAME +
                 " INNER JOIN " + TaskDBContract.TaskDB.TASK_CATEGORY_TABLE_NAME +
@@ -195,7 +197,6 @@ public class TaskEditor {
 
         selection = TaskDBContract.TaskDB._ID + " = " + taskId;
         dbR.delete(TaskDBContract.TaskDB.TASK_TABLE_NAME, selection, null);
-        removeAllRelations(taskId);
     }
 
     public int createTask(String taskName, String dueDate, int priority, int estimation, int basisId){
@@ -393,14 +394,31 @@ public class TaskEditor {
     }
 
     public void removeAllRelations(int taskId){
+        //check if the task is complete or not
+        String[] projection = {
+                TaskDBContract.TaskDB._ID,
+                TaskDBContract.TaskDB.COLUMN_NAME_CHECKED
+        };
+        Cursor c = dbR.query(
+                TaskDBContract.TaskDB.TASK_TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                TaskDBContract.TaskDB._ID + "=?",                                // The columns for the WHERE clause
+                new String[]{String.valueOf(taskId)},                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+        c.moveToFirst();
+        //if it is not complete decrement it's parent's incomplete values
+        if(c.getInt(c.getColumnIndex(TaskDBContract.TaskDB.COLUMN_NAME_CHECKED)) ==0) {
+            ArrayList<Integer> parentIds = getParentIds(taskId);
+            for (int id : parentIds) {
+                updateIncompleteSub(getIncompleteSub(id) - 1, id);
+            }
+        }
         String selection = "(" + TaskDBContract.TaskDB.COLUMN_NAME_PARENT_TASK + " = " +
                 taskId + " OR " + TaskDBContract.TaskDB.COLUMN_NAME_SUB_TASK + " = " + taskId + ")";
         dbR.delete(TaskDBContract.TaskDB.TASK_RELATION_TABLE_NAME, selection, null);
-
-        ArrayList<Integer> parentIds = getParentIds(taskId);
-        for(int id:parentIds){
-            updateIncompleteSub(getIncompleteSub(id) - 1, id);
-        }
     }
 
     public void updateIncompleteSub(int incompleteNumber, int taskId){

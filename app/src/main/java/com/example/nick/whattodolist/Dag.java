@@ -53,12 +53,13 @@ public class Dag {
         //will preform a depth first search of the dag, and return the ids of all parent nodes
         ArrayList<Integer> forbiddenIds = new ArrayList<>();
         DagNode node = nodes.get(taskId);
+        forbiddenIds.add(taskId);
         //list will be empty if the task id does not correspond to a node
         if(node != null) {
             //the given task id will automatically be in the list
             //get all of the parent nodes this node
             node.setDiscovered(true);
-            forbiddenIds.add(node.getTaskId());
+
             for (DagNode parent : getAllParentNodes(node)) {
                 //add each node to the forbidden list
                 forbiddenIds.add(parent.getTaskId());

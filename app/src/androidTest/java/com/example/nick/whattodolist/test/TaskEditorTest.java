@@ -596,7 +596,7 @@ public void setUp() throws Exception {
         String originalDate = "2000-01-01";
         int originalPriority = 1;
         int originalEstimation = 1;
-        int originalChecked = 1;
+        int originalChecked = 0;
         int originalRepeating = -1;
         int originalIncompleteSub = 2;
         int newIncompleteSub = originalIncompleteSub-1;

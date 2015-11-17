@@ -661,7 +661,7 @@ public class RepeatingBasisEditorTest extends ActivityInstrumentationTestCase2<M
         calStart.set(2015, 4, 1);
         Calendar calEnd = Calendar.getInstance();
         calEnd.set(2017, 0, 1);
-        ArrayList<String> result = repeatingBasisEditor.getMonthInYearBasis(calStart,calEnd,2);
+        ArrayList<String> result = repeatingBasisEditor.getMonthInYearBasis(calStart,calEnd,1);
         assertEquals("2016-02-01",result.get(0));
     }
 

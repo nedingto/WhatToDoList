@@ -92,7 +92,7 @@ public class TaskRelationManager {
             for(int i = 0; i < forbiddenTaskIds.size();i++){
                 clause += TaskDBContract.TaskDB._ID + " != " + forbiddenTaskIds.get(i);
                 if(i<forbiddenTaskIds.size()-1){
-                    clause += " OR ";
+                    clause += " AND ";
                 }
             }
             clause += ")";
