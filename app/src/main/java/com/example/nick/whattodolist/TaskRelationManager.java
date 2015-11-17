@@ -48,8 +48,8 @@ public class TaskRelationManager {
     public void removeTmpRelations(int parentId, int subId){
         relationDag.removeEdge(parentId, subId);
     }
-
-    private Dag getTaskRelationDag(){
+    //made public for testing
+    public Dag getTaskRelationDag(){
         Dag taskDag = new Dag();
         String[] projectionRelations = {
                 TaskDBContract.TaskDB._ID,
@@ -77,8 +77,8 @@ public class TaskRelationManager {
 
         return taskDag;
     }
-
-    private ArrayList<Integer> getAllowedTaskIds(){
+    //made pubic for testing
+    public ArrayList<Integer> getAllowedTaskIds(){
         ArrayList<Integer> allowedTaskIds = new ArrayList<>();
         String[] projection = {
                 TaskDBContract.TaskDB._ID,

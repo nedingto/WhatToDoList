@@ -279,8 +279,8 @@ public class TaskEditor {
 
         return getSimpleTasks(null, null, sortOrder);
     }
-
-    private ArrayList<Bundle> getSimpleTasks(String selection,
+    //changed from private for testing
+    public ArrayList<Bundle> getSimpleTasks(String selection,
                                              String[] selectionArgs, String sortOrder){
         ArrayList<Bundle> tasks = new ArrayList<>();
         //query creation

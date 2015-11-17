@@ -283,8 +283,8 @@ public class repeatingBasisEditor {
         }
         return basis;
     }
-
-    private ArrayList<String> getDailyBasis(Calendar calStart, Calendar calEnd,
+    //changed to public for testing
+    public ArrayList<String> getDailyBasis(Calendar calStart, Calendar calEnd,
                                             int periodicalNum) {
         Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
@@ -294,8 +294,8 @@ public class repeatingBasisEditor {
         }
         return basisDates;
     }
-
-    private ArrayList<String> getWeeklyBasis(Calendar calStart, Calendar calEnd,
+    //changed to public for testing
+    public ArrayList<String> getWeeklyBasis(Calendar calStart, Calendar calEnd,
                                              int periodicalNum, int sunday, int monday,
                                              int tuesday, int wednesday, int thursday, int friday,
                                              int saturday) {
@@ -329,8 +329,8 @@ public class repeatingBasisEditor {
         }
         return basisDates;
     }
-
-    private ArrayList<String> getDayOfMonthBasis(Calendar calStart, Calendar calEnd, int ordinalNum) {
+    //changed to public for testing
+    public ArrayList<String> getDayOfMonthBasis(Calendar calStart, Calendar calEnd, int ordinalNum) {
         Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
         //if the start date comes before the day of the month specified and the
@@ -360,8 +360,8 @@ public class repeatingBasisEditor {
         }
         return basisDates;
     }
-
-    private ArrayList<String> getDayOfWeekInMonthBasis(Calendar calStart, Calendar calEnd,
+    //changed to public for testing
+    public ArrayList<String> getDayOfWeekInMonthBasis(Calendar calStart, Calendar calEnd,
                                                        int ordinalPeriod,
                                                        int ordinalNum) {
         Calendar calTmp = (Calendar)calStart.clone();
@@ -379,8 +379,8 @@ public class repeatingBasisEditor {
         }
         return basisDates;
     }
-
-    private ArrayList<String> getLastDayOfMonthBasis(Calendar calStart, Calendar calEnd){
+    //changed to public for testing
+    public ArrayList<String> getLastDayOfMonthBasis(Calendar calStart, Calendar calEnd){
         Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
         calTmp.set(Calendar.DAY_OF_MONTH, calTmp.getActualMaximum(Calendar.DAY_OF_MONTH));
@@ -390,8 +390,8 @@ public class repeatingBasisEditor {
             calTmp.set(Calendar.DAY_OF_MONTH, calTmp.getActualMaximum(Calendar.DAY_OF_MONTH));
         }
         return basisDates;
-    }
-    private ArrayList<String> getLastWeekInMonthBasis(Calendar calStart, Calendar calEnd, int ordinalPeriod){
+    } //changed to public for testing
+    public ArrayList<String> getLastWeekInMonthBasis(Calendar calStart, Calendar calEnd, int ordinalPeriod){
         Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
         //the array is set up so that the indexes of the array line up with the
@@ -418,8 +418,8 @@ public class repeatingBasisEditor {
         }
         return basisDates;
     }
-
-    private ArrayList<String> getMonthInYearBasis(Calendar calStart, Calendar calEnd, int ordinalNum){
+    //changed to public for testing
+    public ArrayList<String> getMonthInYearBasis(Calendar calStart, Calendar calEnd, int ordinalNum){
         Calendar calTmp = (Calendar)calStart.clone();
         ArrayList<String> basisDates = new ArrayList<>();
         calTmp.set(Calendar.MONTH, ordinalNum + 1);
@@ -433,6 +433,36 @@ public class repeatingBasisEditor {
         return basisDates;
     }
 
+    public ArrayList<String> getDayOfMonthBasisOld(Calendar calStart, Calendar calEnd, Calendar calTmp,
+                                                 int ordinalNum) {
+        ArrayList<String> basisDates = new ArrayList<>();
+        //if the start date comes before the day of the month specified and the
+        //current month has the given day, then add it to the date list, otherwise skip it
+        if (calTmp.get(Calendar.DAY_OF_MONTH) <= ordinalNum && ordinalNum
+                <= calTmp.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+            calTmp.set(Calendar.DAY_OF_MONTH, ordinalNum);
+            if (!calTmp.after(calEnd)) {
+                basisDates.add(dateConverter.calendarToSql(calTmp));
+            }
+        }
+
+        calTmp.add(Calendar.MONTH, 1);
+        //if the moth does not have the day, skip that month, thee next month will have it
+        if (ordinalNum > calTmp.getActualMaximum(Calendar.DAY_OF_MONTH))
+            calTmp.add(Calendar.MONTH, 1);
+        calTmp.set(Calendar.DAY_OF_MONTH, ordinalNum);
+
+        //save the date and keep progressing using the same rule as above
+        while (!calTmp.after(calEnd)) {
+            basisDates.add(dateConverter.calendarToSql(calTmp));
+            calTmp.add(Calendar.MONTH, 1);
+            //if the moth does not have the day, skip that month, thee next month will have it
+            if (ordinalNum > calTmp.getActualMaximum(Calendar.DAY_OF_MONTH))
+                calTmp.add(Calendar.MONTH, 1);
+            calTmp.set(Calendar.DAY_OF_MONTH, ordinalNum);
+        }
+        return basisDates;
+    }
 
 
 }

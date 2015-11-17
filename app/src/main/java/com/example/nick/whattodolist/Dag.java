@@ -84,4 +84,12 @@ public class Dag {
         }
         return allParentNodes;
     }
+    //these are more for testing
+    public HashMap<Integer, DagNode> getDagNodes(){
+        return nodes;
+    }
+
+    public void addNode(Integer id, DagNode node){
+        nodes.put(id,node);
+    }
 }
