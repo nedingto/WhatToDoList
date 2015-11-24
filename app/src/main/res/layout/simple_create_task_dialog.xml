@@ -35,8 +35,6 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical" />
 
-        <!-- sugestion to make a check box and when checked open dialog
-        and then fill in bases when checked, disable bases when unchecked-->
     </LinearLayout>
 
     <!-- decided to go with date picker as apposed to spinners

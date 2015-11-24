@@ -20,6 +20,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                     TaskDBContract.TaskDB.COLUMN_NAME_PRIORITY + INTEGER_TYPE + COMMA_SEP +
                     TaskDBContract.TaskDB.COLUMN_NAME_ESTIMATED_MINS + INTEGER_TYPE + COMMA_SEP +
                     TaskDBContract.TaskDB.COLUMN_NAME_REPEATING_BASIS + INTEGER_TYPE + COMMA_SEP +
+                    TaskDBContract.TaskDB.COLUMN_NAME_ASSIGNED_DATE + TEXT_TYPE + COMMA_SEP +
                     TaskDBContract.TaskDB.COLUMN_NAME_INCOMPLETE_SUB + INTEGER_TYPE +
                     ")";
     private static final String SQL_CREATE_CATEGORY_TABLE =
@@ -74,7 +75,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 37;
+    public static final int DATABASE_VERSION = 40;
 
     public static final String DATABASE_NAME = "Task.db";
 

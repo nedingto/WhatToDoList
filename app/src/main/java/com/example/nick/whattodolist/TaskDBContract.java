@@ -22,6 +22,7 @@ public class TaskDBContract {
         public static final String COLUMN_NAME_PRIORITY = "priority";
         public static final String COLUMN_NAME_ESTIMATED_MINS = "estimated_mins";
         public static final String COLUMN_NAME_REPEATING_BASIS = "repeating_basis";
+        public static final String COLUMN_NAME_ASSIGNED_DATE = "assigned_date";
         public static final String COLUMN_NAME_INCOMPLETE_SUB = "incomplete_sub";
 
         public static final String CATEGORY_TABLE_NAME = "category_name";

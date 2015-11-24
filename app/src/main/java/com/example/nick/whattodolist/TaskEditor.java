@@ -26,6 +26,7 @@ public class TaskEditor {
     public final static String BUNDLE_BASIS_ID = "basis_id";
     public final static String BUNDLE_INCOMPLETE_SUB = "incomplete_sub";
     public final static String BUNDLE_CATEGORIES= "categories";
+    public final static String BUNDLE_ASSIGNED_DATE = "assigned_date";
 
 
     public TaskEditor(Context context){
@@ -203,7 +204,7 @@ public class TaskEditor {
         //creates a task and returns the id of it
         ContentValues values = new ContentValues();
         values.put(TaskDBContract.TaskDB.COLUMN_NAME_TASK_NAME,taskName);
-        values.put(TaskDBContract.TaskDB.COLUMN_NAME_DUE_DATE,dueDate);
+        values.put(TaskDBContract.TaskDB.COLUMN_NAME_DUE_DATE, dueDate);
         values.put(TaskDBContract.TaskDB.COLUMN_NAME_CHECKED, 0);
         values.put(TaskDBContract.TaskDB.COLUMN_NAME_PRIORITY, priority);
         values.put(TaskDBContract.TaskDB.COLUMN_NAME_ESTIMATED_MINS, estimation);
@@ -291,7 +292,8 @@ public class TaskEditor {
                 TaskDBContract.TaskDB.COLUMN_NAME_DUE_DATE,
                 TaskDBContract.TaskDB.COLUMN_NAME_CHECKED,
                 TaskDBContract.TaskDB.COLUMN_NAME_PRIORITY,
-                TaskDBContract.TaskDB.COLUMN_NAME_INCOMPLETE_SUB
+                TaskDBContract.TaskDB.COLUMN_NAME_INCOMPLETE_SUB,
+                TaskDBContract.TaskDB.COLUMN_NAME_ASSIGNED_DATE
         };
         Cursor c = dbR.query(
                 TaskDBContract.TaskDB.TASK_TABLE_NAME,  // The table to query
@@ -324,6 +326,8 @@ public class TaskEditor {
             int incompleteSub = c.getInt(c.getColumnIndex(TaskDBContract.TaskDB.COLUMN_NAME_INCOMPLETE_SUB));
             simpleBundle.putInt(BUNDLE_INCOMPLETE_SUB, incompleteSub);
 
+            String assignedDate = c.getString(c.getColumnIndex(TaskDBContract.TaskDB.COLUMN_NAME_ASSIGNED_DATE));
+            simpleBundle.putString(BUNDLE_ASSIGNED_DATE, assignedDate);
 
             tasks.add(simpleBundle);
 
@@ -425,7 +429,7 @@ public class TaskEditor {
         ContentValues values = new ContentValues();
         values.put(TaskDBContract.TaskDB.COLUMN_NAME_INCOMPLETE_SUB, incompleteNumber);
         String selection = TaskDBContract.TaskDB._ID+ " like " + taskId;
-        dbW.update(TaskDBContract.TaskDB.TASK_TABLE_NAME,values,selection,null);
+        dbW.update(TaskDBContract.TaskDB.TASK_TABLE_NAME, values, selection, null);
     }
 
     public int getIncompleteSub(int taskId){
@@ -514,5 +518,16 @@ public class TaskEditor {
             tasks = getSimpleTasks(selection, selectionArgs, null);
         }
         return tasks;
+    }
+
+    public void updateAssignedDate(int taskId, String date){
+        ContentValues values = new ContentValues();
+        values.put(TaskDBContract.TaskDB.COLUMN_NAME_ASSIGNED_DATE, date);
+        int cout = dbR.update(
+                TaskDBContract.TaskDB.TASK_TABLE_NAME,
+                values,
+                TaskDBContract.TaskDB._ID + "=?",
+                new String[]{String.valueOf(taskId)}
+        );
     }
 }

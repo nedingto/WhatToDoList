@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
+import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -35,6 +35,9 @@ public class createRepeatingDialog extends DialogFragment {
     public static final String BUNDLE_DAY_OF_WEEK = "day_of_week";
     public static final String BUNDLE_START_DATE = "start_date";
     public static final String BUNDLE_END_DATE = "end_date";
+    public static String BUNDLE_CURRENT_YEAR = "current_year";
+    public static String BUNDLE_CURRENT_MONTH = "current_month";
+    public static String BUNDLE_CURRENT_DAY = "current_day";
 
     //This is a dialog for the creation of a repeating basis
     @Override
@@ -109,6 +112,7 @@ public class createRepeatingDialog extends DialogFragment {
 
             //initialize the dates
             Calendar c = Calendar.getInstance();
+            c.set(args.getInt(BUNDLE_CURRENT_YEAR), args.getInt(BUNDLE_CURRENT_MONTH),args.getInt(BUNDLE_CURRENT_DAY));
             String today = dateConverter.calendarToString(c);
             ((TextView) dialogView.findViewById(R.id.textView12)).setText(today);
             ((TextView) dialogView.findViewById(R.id.textView23)).setText(today);

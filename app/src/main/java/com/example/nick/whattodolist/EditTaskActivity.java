@@ -1,7 +1,7 @@
 package com.example.nick.whattodolist;
 
 import android.app.DatePickerDialog;
-import android.app.DialogFragment;
+import android.support.v4.app.DialogFragment;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.support.v4.app.FragmentManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -137,7 +138,7 @@ public class EditTaskActivity extends AppCompatActivity
             addSubTask(task);
         }
 
-        fragment = (customSpinnerFragment) getFragmentManager().findFragmentById(R.id.spinner_fragment);
+        fragment = (customSpinnerFragment) getSupportFragmentManager().findFragmentById(R.id.spinner_fragment);
         fragment.setSelected(taskEditor.getCategories(id));
     }
 
@@ -146,7 +147,7 @@ public class EditTaskActivity extends AppCompatActivity
         //if it is repeating, ask if the user wants the changes to go through the entire series
         if(isRepeating) {
             DialogFragment newFragment = new cascadeChangesDialog();
-            newFragment.show(getFragmentManager(), "cascade changes");
+            newFragment.show(getSupportFragmentManager(), "cascade changes");
         } else {
             //if it is not repeating, just follow through as usual
             gatherFields();
@@ -204,7 +205,7 @@ public class EditTaskActivity extends AppCompatActivity
         //should check if the user wants this to cascade
         if(isRepeating) {
             DialogFragment newFragment = new cascadeDeleteDialog();
-            newFragment.show(getFragmentManager(), "delete changes");
+            newFragment.show(getSupportFragmentManager(), "delete changes");
         } else {
             //if it is not repeating, just delete it
             taskEditor.deleteTask(taskId);
@@ -297,7 +298,7 @@ public class EditTaskActivity extends AppCompatActivity
         DialogFragment saveFragment = new discardChangesDialog();
         Bundle args = new Bundle();
         saveFragment.setArguments(args);
-        saveFragment.show(getFragmentManager(), "discard changes");
+        saveFragment.show(getSupportFragmentManager(), "discard changes");
     }
 
     @Override
@@ -305,7 +306,7 @@ public class EditTaskActivity extends AppCompatActivity
         //should show the repeating dialog, populate it if needs it
         DialogFragment newFragment = new createRepeatingDialog();
         newFragment.setArguments(basisBundle);
-        newFragment.show(getFragmentManager(), "edit basis");
+        newFragment.show(getSupportFragmentManager(), "edit basis");
     }
 
     @Override
@@ -313,7 +314,7 @@ public class EditTaskActivity extends AppCompatActivity
         //should give the user a final warning
         DialogFragment commitFragment = new confirmBasisChangeDialog();
         commitFragment.setArguments(repeatingBundle);
-        commitFragment.show(getFragmentManager(), "confirm change");
+        commitFragment.show(getSupportFragmentManager(), "confirm change");
     }
 
     @Override
@@ -384,7 +385,7 @@ public class EditTaskActivity extends AppCompatActivity
             taskIdBundle.putInt(taskEditor.BUNDLE_TASK_ID, taskId);
             //give the dialog an argument of the selected task id
             saveFragment.setArguments(taskIdBundle);
-            saveFragment.show(getFragmentManager(), "discard changes");
+            saveFragment.show(getSupportFragmentManager(), "discard changes");
         }
         return false;
     }
@@ -476,7 +477,7 @@ public class EditTaskActivity extends AppCompatActivity
     public void addNewSubClicked(View v){
         //this starts when the user wants to create a new task for a sub task
         DialogFragment newFragment = new simpleCreateTaskDialog();
-        newFragment.show(getFragmentManager(), "create task");
+        newFragment.show(getSupportFragmentManager(), "create task");
     }
 
     @Override
@@ -513,7 +514,7 @@ public class EditTaskActivity extends AppCompatActivity
         //brings up the existing task dialog
         DialogFragment newFragment = new addExistingSubTaskDialog();
         newFragment.setArguments(relationManager.getAllowedTaskBundle());
-        newFragment.show(getFragmentManager(), "create task");
+        newFragment.show(getSupportFragmentManager(), "create task");
     }
 
     @Override
